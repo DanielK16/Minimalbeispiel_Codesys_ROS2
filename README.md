@@ -118,9 +118,28 @@ ros2 run tf2_tools view_frames
 # Simulation des mycobot280 arm mit RVIZ2
 
 
-<details>
-  <summary>click me </summary>
 
 
+## Aufbau OPC UA Clients
+Aufteilung der OPC UA Kommunikation in drei OPC Clients.
 
-<details>
+**RobotStatus Client**:
+- ist für den Datenaustausch ROS2 -> Codesys verantworlich. Client subscribed auf die Daten /joint_states und /tcp_pose und Daten werden dann an Codesys übertragen. Die Orientierung des TCP wird in ROS2 üblicherweise in Quaternions ausgegeben. Die Umrechnung von Quaternions -> Euler Winkel findet dann in Codesys statt.
+**RobotCommand Client**:
+ist für den Datenaustausch Codesys -> ROS2 verantwortlich. Dabei soll der Roboter manuell angesteuert werden. 
+**RobotAction Client**:
+ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über MoveIt an!  
+
+## Variablentypen ROS2 und IEC 61131-3
+|ROS2|IEC 66131-3|
+|---|---|
+|Bool|BOOL|
+|float64|LREAL|
+|float32|REAL|
+|int32|DINT|
+|int16|INT|
+|string|STRING|
+
+## Aufbau des OPC UA Adressraums
+
+## Aufbau der Codesys Visualisierung
