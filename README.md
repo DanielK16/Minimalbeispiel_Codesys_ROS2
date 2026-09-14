@@ -113,3 +113,14 @@ ros2 run tf2_tools view_frames
 ```
 ![tf2_baum für mycobot280](/doc/img/tf2_Transformation.png)
 
+
+
+# Simulation des mycobot280 arm mit RVIZ2
+
+
+<details>
+  <summary>click me </summary>
+
+
+
+<details>
