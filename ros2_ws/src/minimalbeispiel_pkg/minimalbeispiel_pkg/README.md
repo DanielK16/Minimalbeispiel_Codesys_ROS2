@@ -1,0 +1,3 @@
+Minimalbeispiel:
+Um die Datenübertragung für das Minimalbeispiel zu starten mache
+ros2 run ...

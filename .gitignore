@@ -3,11 +3,16 @@ ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
 ros2_ws/src/ros_tutorials
+ros2_ws/src/mycobot_ros2
 
-# Codesys
+# Codesys 
 codesys/*.precompilecache
 codesys/*.opt
 codesys/*.~u
 codesys/*.bootinfo
 codesys/*.bootinfo_guids
 codesys/*.compileinfo
+codesys/*.xml
+
+# old code folder
+old_code/

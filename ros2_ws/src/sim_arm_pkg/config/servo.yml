@@ -1,0 +1,63 @@
+###############################################################################
+# MoveIt Servo Konfiguration für myCobot / firefighter
+###############################################################################
+
+use_gazebo: false # Auf true setzen, wenn du in Gazebo simulierst
+
+# Art des Eingangssignals ("speed_units" erwartet Geschwindigkeiten in m/s bzw. rad/s)
+command_in_type: "speed_units"
+scale:
+  linear: 0.2        # Max. lineare Geschwindigkeit (m/s)
+  rotational: 0.2    # Max. rotatorische Geschwindigkeit (rad/s)
+  joint: 0.4         # Max. Gelenkgeschwindigkeit (rad/s)
+
+# Filter- und Glättungsparameter (verhindert harte Ruckler)
+publish_period: 0.033  # Frequenz, mit der Servo Befehle sendet (ca. 30 Hz)
+low_pass_filter_coeff: 2.0
+
+# --- ROBOTER & GRUPPEN ---
+move_group_name: "arm_group"              
+planning_frame: "g_base"            # Das Welt-/Basis-Koordinatensystem
+robot_link_command_frame: "g_base"  # Bezugssystem für kartesische Befehle
+ee_frame_name: "joint6_flange"      # Dein Tool Center Point (TCP / Flansch)
+
+# Exakte Liste deiner URDF-Gelenke
+joint_names:
+  - joint2_to_joint1
+  - joint3_to_joint2
+  - joint4_to_joint3
+  - joint5_to_joint4
+  - joint6_to_joint5
+  - joint6output_to_joint6
+
+# --- EINGANGS- & AUSGANGS-TOPICS ---
+cartesian_command_in_topic: "/servo_node/delta_twist_cmds"
+joint_command_in_topic: "/servo_node/delta_joint_cmds"
+command_out_topic: "/arm_group_controller/joint_trajectory"
+
+# NEU: Servo MUSS wissen, welches Nachrichtenformat der Controller erwartet
+command_out_type: "trajectory_msgs/JointTrajectory"
+
+# NEU: Servo MUSS wissen, woher die aktuellen Roboterpositionen kommen
+joint_topic: "/joint_states"
+joint_state_update_delay: 0.05 # Toleranz für verzögerte Joint States (in s)
+
+# NEU: Was soll in die Trajektorie geschrieben werden?
+publish_joint_positions: true
+publish_joint_velocities: false
+publish_joint_accelerations: false
+
+# --- SICHERHEIT & KOLLISIONEN ---
+check_collisions: true              # Echtzeit-Kollisionsprüfung aktivieren!
+collision_check_rate: 10.0          # Prüfrate in Hz
+self_collision_proximity_threshold: 0.01 # Abstand in Metern, ab dem gewarnt wird
+scene_collision_proximity_threshold: 0.02
+
+# NEU: Zwingend erforderlich für Singularitäts-Vermeidung
+# lower_singularity_threshold: 17.0
+# hard_singularity_threshold: 30.0
+singularity_threshold: 0.01
+joint_limit_margin: 0.1 # [rad] Sicherheitsabstand zu den mechanischen Gelenk-Limits
+
+# NEU: Erlaubt Servo, die Planning Scene (Kollisionsobjekte) mitzulesen
+is_primary_planning_scene_monitor: true

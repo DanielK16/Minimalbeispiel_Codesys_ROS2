@@ -1,0 +1,39 @@
+# Definition der topics zum schreiben via opc ua
+# Zwei Informationen sind wichtig für unsere topic bridge
+
+OPC_Client:
+  ipaddress: "172.25.170.32"
+  port: "4840"
+  username: ""  # optional
+  password: ""  # optional
+
+Subscriber:
+  
+  - topic: "/joint_states"
+    type: "sensor_msgs.msg."
+    type_msg: "JointState"
+    name: joint_states
+    NodeIds:
+      name: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx+kvfYf3H2ed4jRxmq0udYTmQA=="
+      position: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx+kvfYf3H2ed4jRxmq0we5rqNH2G7UA="
+      effort: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx+kvfYf3H2ed4jRxmq0lco/sMmDp"
+      velocity: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx+kvfYf3H2ed4jRxmq02cYXsI32d+kA="
+
+#Sonderfall für tf -> hier wird nur tcp point übertragen da sonst sehr viele unnötige daten vom topic mitübertragen
+  - name: "tcp_pose"
+    topic: "/tcp_pose"
+    type: "geometry_msgs.msg.Pose"
+    NodeIds:
+      position.x: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTRmiO0zS5GD"
+      position.y: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTRmiO0zS5CD"
+      position.z: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTRmiO0zS5OD"
+      orientation.x: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTJ7ndw4FA=="
+      orientation.y: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTJ7ndw5FA=="
+      orientation.z: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTJ7ndw6FA=="
+      orientation.w: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTJ7ndw3FA=="
+
+
+# Config für Command
+## mapping der joint_axis angeben
+# nodeIds angeben
+# topics servo node angeben

@@ -131,7 +131,7 @@ ist für den Datenaustausch Codesys -> ROS2 verantwortlich. Dabei soll der Robot
 ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über MoveIt an!  
 
 ## Variablentypen ROS2 und IEC 61131-3
-|ROS2|IEC 66131-3|
+|**ROS2**|**IEC 66131-3**|
 |---|---|
 |Bool|BOOL|
 |float64|LREAL|

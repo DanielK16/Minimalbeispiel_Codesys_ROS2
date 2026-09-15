@@ -2,16 +2,29 @@
 # Quellen:  YT Video: articulated robotics_ Crafting your dockerfile
 # - https://docs.docker.com/reference/dockerfile/
 # - https://docs.docker.com/engine/containers/run/
+# - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile
 
 ########################################
 # Basis Image für ros2 jazzy mit desktop anwendungen (rviz2, gazebo ,rqt)
 ########################################
-FROM osrf/ros:jazzy-desktop-full
+ARG ROS_DISTRO=jazzy
+FROM osrf/ros:${ROS_DISTRO}-desktop-full
+# muss nach FROM nochmals deklariert werden da sonst nicht gültig 
+ARG ROS_DISTRO
+
+########################################
+# Environment Variablen anlegen
+########################################
+# verhindert Fehlermeldungen bei pip installs
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+# verhindert abfragen beim image bau -> Standard Werte werden verwendet
+ENV DEBIAN_FRONTEND=noninteractive
+
 
 ########################################
 # Anlegen eines non root users
 ########################################
-# 1. Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
+#  Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
 RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
 
 # ARG ohne Leerzeichen ausführen
@@ -47,7 +60,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 
 # Python Packages installieren
 # --break-system-pacakges erforderlich da sonst error
-RUN pip3 install asyncua --break-system-packages --ignore-installed cryptography
+RUN pip3 install asyncua --ignore-installed cryptography
 
 
 ########################################
@@ -60,7 +73,7 @@ USER ros
 #WORKDIR /Projektarbeit_Koerper
 
 # source ros2 direkt in .bashrc schreiben damit automatisch gesourced
-RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 
 
 ########################################

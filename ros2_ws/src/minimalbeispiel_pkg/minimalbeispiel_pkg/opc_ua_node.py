@@ -81,7 +81,7 @@ async def async_main(args=None):
         }
                             
         handler = SubscriptionHandler(ros_node, opc_ziel_knoten)
-        sub = await client.create_subscription(100,handler)
+        sub = await client.create_subscription(100,handler) #publishing interval in ms
         await sub.subscribe_data_change([opc_ziel_knoten["linear_x"], opc_ziel_knoten["angular_z"]])
 
         try:
