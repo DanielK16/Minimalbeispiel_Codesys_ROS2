@@ -65,6 +65,15 @@ cd src
 source install/setup.bash
 ```
 
+# Start des Minimalbeispiels
+1. Stelle sicher das der ros2_ws korrekt gebaut wurde mit:
+mit symlink install lassen sich python projekte ohne erneut bauen zu müssen ausführen!
+```
+cd ros2_ws
+colcon build 
+
+```
+
 
 # Entwicklungsumgebung
 |Tool|Version|Befehl zum Prüfen|
