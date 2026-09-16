@@ -3,6 +3,7 @@
   * [a: Übersicht Entwicklungsumgebung](#a-entwicklungsumgebung)
   * [b: Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
 * [1. Minimalbeispiel für Datenaustausch zwischen ROS2 und COdesys via OPC UA](#1-Minimalbeispiel-für-Datenaustausch-zwischen-ROS2-und-Codesys-via-OPC-UA)
+ * [a: Aufbau des OPC UA Adressraums]
 * [2. Funktionsweise](#2-funktionsweise)
 * [3. Installation](#3-installation)
 
@@ -87,8 +88,9 @@ Das Gesamtsystem besteht aus:
 * OPC UA Brücke(asyncua)
 * Codesys VSPS und Visualisierung
 
-
-
+## a: Aufbau des OPC UA Adressraums
+Der Adressraum ist folgendermaßen aufgebaut:
+![Adressraum Minimalbeispiel](/doc/img/Adressraum_Minimalbeispiel.png)
 
 # Start des Minimalbeispiels
 1. Stelle sicher das der ros2_ws korrekt gebaut wurde mit:
