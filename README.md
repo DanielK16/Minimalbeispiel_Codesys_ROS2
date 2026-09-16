@@ -1,17 +1,19 @@
 # Inhaltsverzeichnis
 <details>
-<summary><b>Klicke hier um Inhaltsverzeichnis aufzuklappen</b></summary>
+<summary><b>Klicke hier, um das Inhaltsverzeichnis aufzuklappen</b></summary>
+
 * [0. Einrichtung der Entwicklungsumgebung](#0-einrichtung-der-entwicklungsumgebung)
-  * [a: Übersicht Entwicklungsumgebung](#a-entwicklungsumgebung)
-  * [b: Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
-* [1. Minimalbeispiel für Datenaustausch zwischen ROS2 und COdesys via OPC UA](#1-Minimalbeispiel-für-Datenaustausch-zwischen-ROS2-und-Codesys-via-OPC-UA)
-  * [a: Aufbau des OPC UA Adressraums](#a-aufbau-des-opc-ua-adressraums)
-  * [b: Datenaustauch ROS2 Codesys](#b-datenaustausch-ros2-codesys)
-  * [c: Start des Minimalbeispiels](#c-start-des-minimalbeispiels)
-  * [d: Übersicht des Minimalbeispiels](#d-übersicht-des-minimalbeispiels)
-* [3. Setup des OPC UA Server](#3-setup-für-opc-ua-verbindung)
-  * [a: a: Setup für CODESYS Virtual Control for Linux SL](#a-setup-für-codesys-virtual-control-for-linux-sl)
-* [4. Simulation MyCobot280](#3-installation)
+  * [a. Übersicht Entwicklungsumgebung](#a-übersicht-der-entwicklungsumgebung)
+  * [b. Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
+* [1. Minimalbeispiel für Datenaustausch zwischen ROS 2 und CODESYS via OPC UA](#1-minimalbeispiel-für-datenaustausch-zwischen-ros-2-und-codesys-via-opc-ua)
+  * [a. Aufbau des OPC UA Adressraums](#a-aufbau-des-opc-ua-adressraums)
+  * [b. Datenaustausch ROS 2 und CODESYS](#b-datenaustausch-ros-2-und-codesys)
+  * [c. Start des Minimalbeispiels](#c-start-des-minimalbeispiels)
+  * [d. Übersicht des Minimalbeispiels](#d-übersicht-des-minimalbeispiels)
+* [2. Setup des OPC UA Servers](#2-setup-des-opc-ua-servers)
+  * [a. Setup für CODESYS Virtual Control for Linux SL](#a-setup-für-codesys-virtual-control-for-linux-sl)
+* [3. Simulation MyCobot 280](#3-simulation-mycobot-280)
+
 </details>
 
 # 0. Einrichtung der Entwicklungsumgebung:
