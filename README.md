@@ -98,7 +98,8 @@ source install/setup.bash
 
 # 1. Minimalbeispiel für Datenaustausch zwischen ROS2 und Codesys via OPC UA
 <details>
-<summary><b>Klicke hier, um Kapitel 1 aufzuklappen</b></summary>
+<summary><b>Klicke hier, um Kapitel 1 aufzuklappen</b></summary>  
+
 Das Ziel ist es mithilfe von **turlesim** den Datenaustausch zwischen ROS2 und Codesys darzustellen und zu erlernen wie OPC UA dafür eingebaut und genutzt werden kann.
 turtlesim ist ein Einsteigertool um ROS2 Konzepte zu erlernen.
 Das Gesamtsystem besteht aus:
@@ -147,8 +148,11 @@ Dabei wird zunächst auf das topic /tutle1_pose subscribed und dann die variable
 Codesys -> ROS2: Steuerung der Schildkröte mit Tastern
 Dafür werden die Items in Variablenlsite beschrieben und bei Datenänderung dann von mit einer ros2 node gepublished.
 
-</details>
+</details>  
+
 # 2. Setup für OPC UA Verbindung
+<details>
+<summary><b>Klicke hier, um Kapitel 2 aufzuklappen</b></summary>  
 
 ## a: Setup für CODESYS Virtual Control for Linux SL
 
@@ -181,21 +185,7 @@ Folgende Images sind zu installieren:
 ### 6. Verbindung Device herstellen
 ![Verbindung zum Device herstellen!](/doc/img/device_verbiindung_codesys.png)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<details>  
 
 # 3. Simulation MyCobot280
 
