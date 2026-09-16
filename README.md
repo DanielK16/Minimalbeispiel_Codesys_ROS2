@@ -224,7 +224,6 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 
 </details>  
 
-
 classDiagram
     %% Structs (ROS 2 Message Mappings)
     class ST_JointStates {
