@@ -185,11 +185,11 @@ Folgende Images sind zu installieren:
 ### 6. Verbindung Device herstellen
 ![Verbindung zum Device herstellen!](/doc/img/device_verbiindung_codesys.png)
 
-<details>  
+
 
 # 3. Simulation MyCobot280
 <details>
-<summary><b>Klicke hier, um Kapitel 2 aufzuklappen</b></summary>  
+<summary><b>Klicke hier, um Kapitel 3 aufzuklappen</b></summary>  
 
 ## a: Aufbau des transformations tree mycobot280
 Um den Aufbau des Transformationen Baums zu sehen kann man folgendes tool verwenden:
