@@ -117,7 +117,7 @@ colcon build --packages-select minimalbeispiel_pkg --symlink-install
 ```
 
 # d: Übersicht des Minimalbeispiels
-Beispielsvideo:
+Beispielsvideo:  
 ![Beispielsdarstellung](/doc/vid/codesys_ros2_minimalbeispiel.gif)
 
 In diesem Beispiel wird der Datenaustausch wird der Datenaustausch in beide Richtungen getestet:
