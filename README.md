@@ -37,11 +37,16 @@ In Windows Power Shell:
 ```
 wsl --install -d Ubuntu-24.04
 ```
-Anschließend Benutzer und Passwort festlegen
-wsl kann gestartet werden mit: ``` wsl ```
+Anschließend Benutzer und Passwort festlegen.  
+wsl kann gestartet werden mit: ``` wsl ```  
+Für OPC UA wird später SSH benötigt:
+```
+sudo apt update && sudo apt install -y openssh-server
+service ssh start
+```
 
 1. Github in WSL Workspace clonen
-In WSL:
+In WSL:  
 ```
 git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
 ```
@@ -76,7 +81,7 @@ docker exec -it <image_name> bash
 4. Codesys Projekt öffnen und mit Deploy Tool Container einrichten
 Die Einrichtung mit dem Deploy Tool ist weiter unten ausführlich erklärt
 
-5. ROS2 Projekt bauen mit apt-get update, rosdep update, rosdep install..., colcon build
+5. ROS2 Projekt bauen
 ```
 sudo apt update
 sudo apt upgrade -y
@@ -131,7 +136,7 @@ Dabei wird zunächst auf das topic /tutle1_pose subscribed und dann die variable
 Codesys -> ROS2: Steuerung der Schildkröte mit Tastern
 Dafür werden die Items in Variablenlsite beschrieben und bei Datenänderung dann von mit einer ros2 node gepublished.
 
-# 3. Setup für OPC UA Verbindung
+# 2. Setup für OPC UA Verbindung
 
 ## a: Setup für CODESYS Virtual Control for Linux SL
 
@@ -165,7 +170,24 @@ Folgende Images sind zu installieren:
 ![Verbindung zum Device herstellen!](/doc/img/device_verbiindung_codesys.png)
 
 
-# Aufbau tf transformations mycobot280
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 3. Simulation MyCobot280
+
+## a: Aufbau des transformations tree mycobot280
 Um den Aufbau des Transformationen Baums zu sehen kann man folgendes tool verwenden:
 tf2 übernimmt für uns die Arbeit der Transformationen!
 ```
@@ -173,14 +195,7 @@ ros2 run tf2_tools view_frames
 ```
 ![tf2_baum für mycobot280](/doc/img/tf2_Transformation.png)
 
-
-
-# Simulation des mycobot280 arm mit RVIZ2
-
-
-
-
-## Aufbau OPC UA Clients
+## b: Aufbau OPC UA Clients
 Aufteilung der OPC UA Kommunikation in drei OPC Clients.
 
 **RobotStatus Client**:
@@ -190,7 +205,7 @@ ist für den Datenaustausch Codesys -> ROS2 verantwortlich. Dabei soll der Robot
 **RobotAction Client**:
 ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über MoveIt an!  
 
-## Variablentypen ROS2 und IEC 61131-3
+## c: Variablentypen ROS2 und IEC 61131-3
 |**ROS2**|**IEC 66131-3**|
 |---|---|
 |Bool|BOOL|
@@ -200,6 +215,5 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 |int16|INT|
 |string|STRING|
 
-## Aufbau des OPC UA Adressraums
+## Aufbau des OPC UA Adressraums für mycobt Visualisierung
 
-## Aufbau der Codesys Visualisierung
