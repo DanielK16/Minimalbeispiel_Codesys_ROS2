@@ -1,4 +1,6 @@
 # Inhaltsverzeichnis
+<details>
+<summary><b>Klicke hier um Inhaltsverzeichnis aufzuklappen</b></summary>
 * [0. Einrichtung der Entwicklungsumgebung](#0-einrichtung-der-entwicklungsumgebung)
   * [a: Übersicht Entwicklungsumgebung](#a-entwicklungsumgebung)
   * [b: Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
@@ -10,6 +12,7 @@
 * [3. Setup des OPC UA Server](#3-setup-für-opc-ua-verbindung)
   * [a: a: Setup für CODESYS Virtual Control for Linux SL](#a-setup-für-codesys-virtual-control-for-linux-sl)
 * [4. Simulation MyCobot280](#3-installation)
+</details>
 
 # 0. Einrichtung der Entwicklungsumgebung:
 
