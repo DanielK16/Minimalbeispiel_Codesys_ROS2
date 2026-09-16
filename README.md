@@ -188,6 +188,8 @@ Folgende Images sind zu installieren:
 <details>  
 
 # 3. Simulation MyCobot280
+<details>
+<summary><b>Klicke hier, um Kapitel 2 aufzuklappen</b></summary>  
 
 ## a: Aufbau des transformations tree mycobot280
 Um den Aufbau des Transformationen Baums zu sehen kann man folgendes tool verwenden:
@@ -219,3 +221,4 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 
 ## Aufbau des OPC UA Adressraums für mycobt Visualisierung
 
+<details>
