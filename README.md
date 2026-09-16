@@ -185,7 +185,7 @@ Folgende Images sind zu installieren:
 ### 6. Verbindung Device herstellen
 ![Verbindung zum Device herstellen!](/doc/img/device_verbiindung_codesys.png)
 
-
+</details>  
 
 # 3. Simulation MyCobot280
 <details>
@@ -221,4 +221,4 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 
 ## Aufbau des OPC UA Adressraums für mycobt Visualisierung
 
-<details>
+</details>  
