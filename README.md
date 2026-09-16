@@ -17,7 +17,8 @@
 </details>
 
 # 0. Einrichtung der Entwicklungsumgebung:
-
+<details>
+<summary><b>Klicke hier, um Kapitel 0 aufzuklappen</b></summary>
 ## a: Entwicklungsumgebung
 |Tool|Version|Befehl zum Prüfen|
 |---|---|---|
@@ -93,8 +94,11 @@ colcon build
 cd src
 source install/setup.bash
 ```
+</details>
 
 # 1. Minimalbeispiel für Datenaustausch zwischen ROS2 und Codesys via OPC UA
+<details>
+<summary><b>Klicke hier, um Kapitel 1 aufzuklappen</b></summary>
 Das Ziel ist es mithilfe von **turlesim** den Datenaustausch zwischen ROS2 und Codesys darzustellen und zu erlernen wie OPC UA dafür eingebaut und genutzt werden kann.
 turtlesim ist ein Einsteigertool um ROS2 Konzepte zu erlernen.
 Das Gesamtsystem besteht aus:
@@ -123,7 +127,14 @@ mit symlink install lassen sich python projekte ohne erneut bauen zu müssen aus
 ```
 cd ros2_ws
 colcon build --packages-select minimalbeispiel_pkg --symlink-install
+source install/setup.bash
+```
+2. Starten des OPC Servers in Codesys und Einloggen + Starten
 
+3. Starten der turtlesim node und der kommunikations node in zwei separaten terminals
+```
+ros2 run turtlesim turtlesim_node
+ros2 run minimalbeispiel_pkg opc_node 
 ```
 
 # d: Übersicht des Minimalbeispiels
@@ -136,6 +147,7 @@ Dabei wird zunächst auf das topic /tutle1_pose subscribed und dann die variable
 Codesys -> ROS2: Steuerung der Schildkröte mit Tastern
 Dafür werden die Items in Variablenlsite beschrieben und bei Datenänderung dann von mit einer ros2 node gepublished.
 
+</details>
 # 2. Setup für OPC UA Verbindung
 
 ## a: Setup für CODESYS Virtual Control for Linux SL
