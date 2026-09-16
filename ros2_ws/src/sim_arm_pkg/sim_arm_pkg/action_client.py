@@ -31,7 +31,7 @@ class ROSNode(Node):
         self._action_client.wait_for_server()
         self.get_logger().info('Action Server gefunden')
 
-    def create_ompl_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5):
+    def create_ompl_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5, joint_tolerance_above = 0.01, joint_tolerance_below=0.01):
         goal_msg = MoveGroup.Goal()
 
         goal_msg.request.pipeline_id = 'ompl'
@@ -48,48 +48,48 @@ class ROSNode(Node):
         joint_constraints.append(JointConstraint(
             joint_name='joint2_to_joint1',
             position=axis_0,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance_above,
+            tolerance_below=joint_tolerance_below,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint3_to_joint2',
             position=axis_1,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance_above,
+            tolerance_below=joint_tolerance_below,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint4_to_joint3',
             position=axis_2,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance_above,
+            tolerance_below=joint_tolerance_below,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint5_to_joint4',
             position=axis_3,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance_above,
+            tolerance_below=joint_tolerance_below,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint6_to_joint5',
             position=axis_4,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance_above,
+            tolerance_below=joint_tolerance_below,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint6output_to_joint6',
             position=axis_5,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance_above,
+            tolerance_below=joint_tolerance_below,
             weight=1.0
         ))
 
@@ -390,71 +390,18 @@ class ROSNode(Node):
         if pipeline_id == "pilz_industrial_motion_planner":
             if planner_id == "PTP":
                 if Joint_Goal:
-                    return self.create_pilz_ptp_joint_goal(
-                        planning_attempts,
-                        planning_time,
-                        velocity_scaling,
-                        acceleration_scaling,
-                        axis_0,
-                        axis_1,
-                        axis_2,
-                        axis_3,
-                        axis_4,
-                        axis_5
-                    )
+                    return self.create_pilz_ptp_joint_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,axis_0,axis_1,axis_2,axis_3,axis_4,axis_5)
                 elif TCP_Goal:
-                    return self.create_pilz_ptp_tcp_goal(
-                        planning_attempts,
-                        planning_time,
-                        velocity_scaling,
-                        acceleration_scaling,
-                        trans_x,
-                        trans_y,
-                        trans_z,
-                        rot_x,
-                        rot_y,
-                        rot_z,
-                        rot_w,
-                        position_tolerance,
-                        orientation_tolerance
-                    )
+                    return self.create_pilz_ptp_tcp_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
                 else:
                     self.get_logger().error('Joint Goal oder TCP Goal auswählen')
                     return None
 
             elif planner_id == "LIN":
-                return self.create_pilz_lin_goal(
-                    planning_attempts,
-                    planning_time,
-                    velocity_scaling,
-                    acceleration_scaling,
-                    trans_x,
-                    trans_y,
-                    trans_z,
-                    rot_x,
-                    rot_y,
-                    rot_z,
-                    rot_w,
-                    position_tolerance,
-                    orientation_tolerance
-                )
+                return self.create_pilz_lin_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
 
             elif planner_id == "CIRC":
-                return self.create_pilz_circ_goal(
-                    planning_attempts,
-                    planning_time,
-                    velocity_scaling,
-                    acceleration_scaling,
-                    trans_x,
-                    trans_y,
-                    trans_z,
-                    rot_x,
-                    rot_y,
-                    rot_z,
-                    rot_w,
-                    position_tolerance,
-                    orientation_tolerance
-                )
+                return self.create_pilz_circ_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
 
             else:
                 self.get_logger().error(f'Ungültige Planner ID: {planner_id}')
@@ -462,35 +409,10 @@ class ROSNode(Node):
 
         elif pipeline_id == "ompl":
             if Joint_Goal:
-                return self.create_ompl_joint_goal(
-                    planning_attempts,
-                    planning_time,
-                    velocity_scaling,
-                    acceleration_scaling,
-                    axis_0,
-                    axis_1,
-                    axis_2,
-                    axis_3,
-                    axis_4,
-                    axis_5
-                )
+                return self.create_ompl_joint_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,axis_0,axis_1,axis_2,axis_3,axis_4,axis_5)
 
             elif TCP_Goal:
-                return self.create_ompl_tcp_goal(
-                    planning_attempts,
-                    planning_time,
-                    velocity_scaling,
-                    acceleration_scaling,
-                    trans_x,
-                    trans_y,
-                    trans_z,
-                    rot_x,
-                    rot_y,
-                    rot_z,
-                    rot_w,
-                    position_tolerance,
-                    orientation_tolerance
-                )
+                return self.create_ompl_tcp_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
 
             else:
                 self.get_logger().error('Joint Goal oder TCP Goal auswählen')

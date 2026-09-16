@@ -14,7 +14,6 @@ class ROS_Node(Node):
     def __init__(self):
         super().__init__('ros_node')
 
-        # declare parent and child frame -> auslesen aus tf baum
         self.parent_frame = "g_base"
         self.child_frame =  "joint6_flange"
 

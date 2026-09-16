@@ -58,7 +58,7 @@ async def async_main(args=None):
                       reconnect_request_timeout = 5.0, ) as client:
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
-        # Pos_Axis (Einzelne Achsknoten von 0 bis 5)
+        # Pos_Axis 
         axis_nodes = {
             "axis_0": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfJOk="),
             "axis_1": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfJek="),

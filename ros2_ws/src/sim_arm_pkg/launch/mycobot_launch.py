@@ -14,17 +14,18 @@ def load_yaml(package_name, file_path):
         return yaml.safe_load(file)
 
 def generate_launch_description():
-    # 1. MoveIt Konfiguration laden 
+
+    # MoveIt Konfiguration  
     moveit_config = MoveItConfigsBuilder(
         robot_name="firefighter", 
         package_name="mycobot_280arduino_moveit2"
     ).to_moveit_configs()
 
-    # 2. Die servo.yaml Konfiguration laden
+    # servo.yaml Konfiguration
     servo_yaml = load_yaml("sim_arm_pkg", "config/servo.yml")
     servo_params = {"moveit_servo": servo_yaml}
 
-    # 3. Den Servo-Knoten definieren
+    # Servo-Knoten 
     servo_node = Node(
         package="moveit_servo",
         executable="servo_node_main",
@@ -38,10 +39,10 @@ def generate_launch_description():
         output="screen",
     )
 
-    # 4. Standard MoveIt Demo-Launch generieren (startet move_group, rviz, robot_state_publisher etc.)
+    # Standard MoveIt Demo-Launch generieren (startet move_group, rviz, robot_state_publisher etc.)
     demo_launch_description = generate_demo_launch(moveit_config)
 
-    # 5. Deinen Servo-Node zur gemeinsamen Launch-Beschreibung hinzufügen
+    # Servo-Node zur gemeinsamen Launch-Beschreibung 
     demo_launch_description.add_action(servo_node)
 
     return demo_launch_description

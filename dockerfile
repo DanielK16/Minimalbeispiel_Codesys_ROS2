@@ -62,7 +62,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 # --break-system-pacakges erforderlich da sonst error
 RUN pip3 install asyncua --ignore-installed cryptography
 
-
+# ROS2 packages installieren
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y ros-humble-pick-ik
 ########################################
 # USER ros Umgebung einrichten
 ########################################

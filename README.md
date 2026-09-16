@@ -7,19 +7,30 @@ Das Gesamtsystem besteht aus:
 * Codesys VSPS und Visualisierung
 
 
-# Installation and Usage
-0. Github in WSL workspace clonen
+# Einrichtung der Entwicklungsumgebung:
+0. WSL2 einrichten
+In Windows Power Shell:
+```
+wsl --install -d Ubuntu-24.04
+```
+Anschließend Benutzer und Passwort festlegen
+wsl kann gestartet werden mit: ``` wsl ```
+
+1. Github in WSL Workspace clonen
+In WSL:
 ```
 git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
 ```
-1. Dockerfile -> Image
+2. Dockerfile -> Image
+Im Github liegt ein Dockerfile ab unter /Minimalbeispiel_Codesys_ROS2
 Passe `--build-arg` an, ob ROS 2 **Humble** oder **Jazzy** benötigt wird:
 ```
 docker build -t --build-arg ROS_DISTRO=humble <image_name> .
 ```
-2. Image -> Container
+
+3. Image -> Container
 eventuell -v anpassen je nachdem wohin github gecloned wurde!
-auf Pfad achten -v!
+**auf Pfad achten -v!**
 ```
 docker run -it \
   --name minimalbsp_ros2_codesys \
@@ -33,9 +44,27 @@ docker run -it \
   <image_name> \
   /bin/bash
 ```
-3. Codesys Projekt öffnen und mit Deploy Tool Container einrichten
+4. Container starten mit:
+```
+docker exec -it <image_name> bash
+```
 
-4. ROS2 Projekt bauen mit apt-get update, rosdep update, rosdep install..., colcon build
+4. Codesys Projekt öffnen und mit Deploy Tool Container einrichten
+Die Einrichtung mit dem Deploy Tool ist weiter unten ausführlich erklärt
+
+5. ROS2 Projekt bauen mit apt-get update, rosdep update, rosdep install..., colcon build
+```
+sudo apt update
+sudo apt upgrade -y
+cd ros2_ws
+rosdep init
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+colcon build
+cd src
+source install/setup.bash
+```
+
 
 # Entwicklungsumgebung
 |Tool|Version|Befehl zum Prüfen|

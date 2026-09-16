@@ -17,14 +17,14 @@ def generate_launch_description():
         ),
 
         Node(
-                    package = 'sim_arm_pkg',
-                    executable = 'command_client',
-                    name = 'command_client_node'
+            package = 'sim_arm_pkg',
+            executable = 'command_client',
+            name = 'command_client_node'
         ),
 
         Node(
-                    package = 'sim_arm_pkg',
-                    executable = 'action_client',
-                    name = 'action_client_node'
+            package = 'sim_arm_pkg',
+            executable = 'action_client',
+            name = 'action_client_node'
         ),
     ])
