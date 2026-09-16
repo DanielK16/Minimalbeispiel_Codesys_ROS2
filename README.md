@@ -18,7 +18,8 @@
 
 # 0. Einrichtung der Entwicklungsumgebung:
 <details>
-<summary><b>Klicke hier, um Kapitel 0 aufzuklappen</b></summary>
+<summary><b>Klicke hier, um Kapitel 0 aufzuklappen</b></summary>  
+
 ## a: Entwicklungsumgebung
 |Tool|Version|Befehl zum Prüfen|
 |---|---|---|
