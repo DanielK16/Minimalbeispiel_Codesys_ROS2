@@ -1,13 +1,27 @@
-# Minimalbeispiel für Datenaustausch zwischen ROS2 und Codesys via OPC UA
-Das Ziel ist es mithilfe von **turlesim** den Datenaustausch zwischen ROS2 und Codesys darzustellen und zu erlernen wie OPC UA dafür eingebaut und genutzt werden kann.
-turtlesim ist ein Einsteigertool um ROS2 Konzepte zu erlernen.
-Das Gesamtsystem besteht aus:
-* ROS2 Simulation turtlesim
-* OPC UA Brücke(asyncua)
-* Codesys VSPS und Visualisierung
+# Inhaltsverzeichnis
+* [0. Einrichtung der Entwicklungsumgebung](#0-einrichtung-der-entwicklungsumgebung)
+  * [a: Übersicht Entwicklungsumgebung](#a-entwicklungsumgebung)
+  * [b: Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
+* [1. Minimalbeispiel für Datenaustausch zwischen ROS2 und COdesys via OPC UA](#1-Minimalbeispiel-für-Datenaustausch-zwischen-ROS2-und-Codesys-via-OPC-UA)
+* [2. Funktionsweise](#2-funktionsweise)
+* [3. Installation](#3-installation)
 
+# 0. Einrichtung der Entwicklungsumgebung:
 
-# Einrichtung der Entwicklungsumgebung:
+## a: Entwicklungsumgebung
+|Tool|Version|Befehl zum Prüfen|
+|---|---|---|
+|Host Betriebssystem|WIN11|winver|
+|Subsystem|WSL2: Ubuntu-24.04 | wsl -l -v|	
+|Container Plattform|Docker Desktop 4.88.1|docker version|	
+|SPS Entwicklungsumgebung|Codesys Development V3.5 SP22 Patch 2|Codesys Installer |
+|SPS Runtime| CODESYS Virtual Runtime for Linux SL|Codesys Installer|
+|ROS Distribution	|ROS2 Jazzy| echo $ROS_DISTRO|
+|Versionsverwaltung|git 2.43.0| git --version|
+
+![Entwicklungsumgebung Aufbau](/doc/img/Aufbau_Entwicklungsumgebung.png)
+
+## b: Installation der Entwicklungsumgebung
 0. WSL2 einrichten
 In Windows Power Shell:
 ```
@@ -65,28 +79,28 @@ cd src
 source install/setup.bash
 ```
 
+# 1. Minimalbeispiel für Datenaustausch zwischen ROS2 und Codesys via OPC UA
+Das Ziel ist es mithilfe von **turlesim** den Datenaustausch zwischen ROS2 und Codesys darzustellen und zu erlernen wie OPC UA dafür eingebaut und genutzt werden kann.
+turtlesim ist ein Einsteigertool um ROS2 Konzepte zu erlernen.
+Das Gesamtsystem besteht aus:
+* ROS2 Simulation turtlesim
+* OPC UA Brücke(asyncua)
+* Codesys VSPS und Visualisierung
+
+
+
+
 # Start des Minimalbeispiels
 1. Stelle sicher das der ros2_ws korrekt gebaut wurde mit:
 mit symlink install lassen sich python projekte ohne erneut bauen zu müssen ausführen!
 ```
 cd ros2_ws
-colcon build 
+colcon build --packages-select minimalbeispiel_pkg --symlink-install
 
 ```
 
 
-# Entwicklungsumgebung
-|Tool|Version|Befehl zum Prüfen|
-|---|---|---|
-|Host Betriebssystem|WIN11|winver|
-|Subsystem|WSL2: Ubuntu-24.04 | wsl -l -v|	
-|Container Plattform|Docker Desktop 4.88.1|docker version|	
-|SPS Entwicklungsumgebung|Codesys Development V3.5 SP22 Patch 2|Codesys Installer |
-|SPS Runtime| CODESYS Virtual Runtime for Linux SL|Codesys Installer|
-|ROS Distribution	|ROS2 Jazzy| echo $ROS_DISTRO|
-|Versionsverwaltung|git 2.43.0| git --version|
 
-![Entwicklungsumgebung Aufbau](/doc/img/Aufbau_Entwicklungsumgebung.png)
 
 # Datenaustausch ROS2 und Codesys
 Für Datenaustausch zwischen ROS2 und Codesys gibt es generell 3 Möglichkeiten:
