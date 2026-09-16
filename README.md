@@ -3,9 +3,13 @@
   * [a: Übersicht Entwicklungsumgebung](#a-entwicklungsumgebung)
   * [b: Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
 * [1. Minimalbeispiel für Datenaustausch zwischen ROS2 und COdesys via OPC UA](#1-Minimalbeispiel-für-Datenaustausch-zwischen-ROS2-und-Codesys-via-OPC-UA)
- * [a: Aufbau des OPC UA Adressraums]
-* [2. Funktionsweise](#2-funktionsweise)
-* [3. Installation](#3-installation)
+  * [a: Aufbau des OPC UA Adressraums](#a-aufbau-des-opc-ua-adressraums)
+  * [b: Datenaustauch ROS2 Codesys](#b-datenaustausch-ros2-codesys)
+  * [c: Start des Minimalbeispiels](#c-start-des-minimalbeispiels)
+  * [d: Übersicht des Minimalbeispiels](#d-übersicht-des-minimalbeispiels)
+* [3. Setup des OPC UA Server](#3-setup-für-opc-ua-verbindung)
+  * [a: a: Setup für CODESYS Virtual Control for Linux SL](#a-setup-für-codesys-virtual-control-for-linux-sl)
+* [4. Simulation MyCobot280](#3-installation)
 
 # 0. Einrichtung der Entwicklungsumgebung:
 
@@ -92,7 +96,18 @@ Das Gesamtsystem besteht aus:
 Der Adressraum ist folgendermaßen aufgebaut:
 ![Adressraum Minimalbeispiel](/doc/img/Adressraum_Minimalbeispiel.png)
 
-# Start des Minimalbeispiels
+## b: Datenaustausch ROS2 Codesys
+Für Datenaustausch zwischen ROS2 und Codesys gibt es generell 3 Möglichkeiten:
+- Shared Memory (IPC) -> z.B: ROBIN Projekt
+- Feldbusse (ModbusTCP, EtherCAT, ...)
+- Netzwerkprotokolle (OPC UA, MQTT, rosbridge)
+Entschieden für OPC UA, da industrieller Standard und "einfach" zu implementieren.
+
+![Datenaustausch ROS2 und Codesys](/doc/img/Datenaustausch_Codesys_ROS2.png)
+Die Topics aus ROS2 werden auf Structs in Codesys gemapped mit diesen dann der Adressraum aufgebaut wird.
+Für die OPC UA Kommunikation wird das [opcua-asyncio](https://github.com/FreeOpcUa/opcua-asyncio) verwendet.
+
+# c: Start des Minimalbeispiels
 1. Stelle sicher das der ros2_ws korrekt gebaut wurde mit:
 mit symlink install lassen sich python projekte ohne erneut bauen zu müssen ausführen!
 ```
@@ -101,23 +116,8 @@ colcon build --packages-select minimalbeispiel_pkg --symlink-install
 
 ```
 
-
-
-
-# Datenaustausch ROS2 und Codesys
-Für Datenaustausch zwischen ROS2 und Codesys gibt es generell 3 Möglichkeiten:
-- Shared Memory (IPC) -> z.B: ROBIN Projekt
-- Feldbusse (ModbusTCP, EtherCAT, ...)
-- Netzwerkprotokolle (OPC UA, MQTT, rosbridge)
-
-Entschieden für OPC UA, da industrieller Standard und "einfach" zu implementieren.
-![Datenaustausch ROS2 und Codesys](/doc/img/Datenaustausch_Codesys_ROS2.png)
-
-Für die OPC UA Kommunikation wird das [opcua-asyncio](https://github.com/FreeOpcUa/opcua-asyncio) verwendet.
-
-https://github.com/FreeOpcUa/opcua-asyncio
-
-# Beispiel
+# d: Übersicht des Minimalbeispiels
+Beispielsvideo:
 ![Beispielsdarstellung](/doc/vid/codesys_ros2_minimalbeispiel.gif)
 
 In diesem Beispiel wird der Datenaustausch wird der Datenaustausch in beide Richtungen getestet:
@@ -126,9 +126,10 @@ Dabei wird zunächst auf das topic /tutle1_pose subscribed und dann die variable
 Codesys -> ROS2: Steuerung der Schildkröte mit Tastern
 Dafür werden die Items in Variablenlsite beschrieben und bei Datenänderung dann von mit einer ros2 node gepublished.
 
-# Setup für OPC UA Verbindung
+# 3. Setup für OPC UA Verbindung
 
-# Setup für CODESYS Virtual Control for Linux SL
+## a: Setup für CODESYS Virtual Control for Linux SL
+
 ### 1. Deploy Tool installieren 
 Folgende Tools sind mit dem **Codesys Install Manager** zu installieren:
 * 'CODESYS Virtual Control for Linux SL'
