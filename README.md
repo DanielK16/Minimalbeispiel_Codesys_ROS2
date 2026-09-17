@@ -224,6 +224,8 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 
 
 # Beispielsvideo zur Steuerung der Visualisierung
-![mycobot manuelle Steuerung](/doc/vid/manuelle_steuerung_mycobot.gif)
+![Visualisierung Codesys](/doc/img/Visualisierung_Codesys.png)
+
+![mycobot manuelle Steuerung](/doc/vid/mycobot_manuelle_steuerung.gif)
 
 </details>  
