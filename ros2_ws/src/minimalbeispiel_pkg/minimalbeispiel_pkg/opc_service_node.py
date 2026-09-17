@@ -82,7 +82,7 @@ async def async_main(args=None):
 
         # OPC UA Subscription
         handler = SubscriptionHandler(opc_ziel_knoten)
-        sub = await client.create_subscription(100,handler)         #für was steht die 100?
+        sub = await client.create_subscription(100,handler)         
         await sub.subscribe_data_change([
             opc_ziel_knoten["req_x"],
             opc_ziel_knoten["req_y"],

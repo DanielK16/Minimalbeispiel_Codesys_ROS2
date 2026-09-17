@@ -55,15 +55,20 @@ class SubscriptionHandler:
         
 
 async def async_main(args=None):
+    ros_node = OPC_UA_Client_Node()
+
     # OPC UA Verbindungsaufbau
     ipaddress = "172.25.170.32"
     port = "4840"
     opc_url = f"opc.tcp://{ipaddress}:{port}"
-
-    ros_node = OPC_UA_Client_Node()
-
-    async with Client(opc_url) as client:
-        print(f"OPC Client: {opc_url} verbunden")
+    async with Client(url = opc_url,                    # Netzwerkadresse des Servers
+                      timeout = 2.0,                    # Maximaler Zeitraum die Client auf Server Antwort wartet
+                      watchdog_intervall = 0.5,         # alle 500ms checken ob Verbindung noch lebt
+                      auto_reconnect = True,            # wenn Verbidnung unterbrochen automatisch wiederverbinden
+                      reconnect_max_delay = 5.0,        # Wartzezeit zwischen zwei Versuchen beim Verbinden
+                      reconnect_request_timeout = 5.0,  # Dauer die die Verbindung zum Server maximal dauern darf 
+                        ) as client:
+        ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
         
         # node holen
         opc_ziel_knoten = {
