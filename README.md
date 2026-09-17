@@ -203,6 +203,8 @@ ros2 run tf2_tools view_frames
 ## b: Aufbau OPC UA Clients
 Aufteilung der OPC UA Kommunikation in drei OPC Clients.
 
+![OPC Clients](/doc/img/ClientAufbau.png)
+
 **RobotStatus Client**:
 - ist für den Datenaustausch ROS2 -> Codesys verantworlich. Client subscribed auf die Daten /joint_states und /tcp_pose und Daten werden dann an Codesys übertragen. Die Orientierung des TCP wird in ROS2 üblicherweise in Quaternions ausgegeben. Die Umrechnung von Quaternions -> Euler Winkel findet dann in Codesys statt.
 **RobotCommand Client**:
@@ -243,11 +245,23 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
   </tr>
 </table>  
 
-
 # Beispielsvideo zur Steuerung der Visualisierung
 ![Visualisierung Codesys](/doc/img/Visualisierung_Codesys.png)
 ## Manuelle Steuerung
 ![mycobot manuelle Steuerung](/doc/vid/mycobot_manuelle_steuerung.gif)
+
 ## Automatik Steuerung mit Bahnplanung durch MoveIt
+Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw. Konfigurationen für die Bahnplanung realisiert werden:
+
+* **OMPL (Open Motion Planning Library):**
+  * Standardmäßig wird hierbei der Algorithmus *RRT (Rapidly-exploring Random Tree)* verwendet
+  * Die Planung kann wahlweise im Gelenkraum (*Joint Space*) oder im kartesischen Raum (*Cartesian Space*) erfolgen.
+
+* **Pilz Industrial Motion Planner:**
+  * Ermöglicht die Bahnplanung ebenfalls wahlweise im Gelenk- oder im kartesischen Raum.
+  * Unterstützt die standardisierten Bewegungsprimitive PTP (*Point-to-Point*), LIN (*Linear*) und CIR (*Circular*).
+  * *Hinweis zum Implementierungsstatus:* Während PTP- und LIN-Bewegungen bereits fehlerfrei ausgeführt werden können, befindet sich die zirkulare Interpolation (CIR) aktuell noch in der Implementierungsphase und ist noch nicht vollständig funktionsfähig.  
+  * LIN schlägt häufiger fehl da mit 6 achsen nicht jede position linear angefahren werden kann! Orientierung muss übereinstimmen!
+
 
 </details>  
