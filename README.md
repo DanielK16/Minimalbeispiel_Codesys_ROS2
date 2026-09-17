@@ -220,8 +220,29 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 |int16|INT|
 |string|STRING|
 
-## Aufbau des OPC UA Adressraums für mycobot Visualisierung
- ![UA expert base](/doc/img/uaE_Base.png)  ![Ua expert Status](/doc/img/uaE_Status.png)  ![UA expert command](/doc/img/uaE_Command.png)  ![UA Expert Action](/doc/img/uaE_Action.png)
+## Aufbau des OPC UA Adressraums für mycobot Visualisierung  
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="/doc/img/uaE_Base.png" width="100%"><br>
+      <sub><b>Base</b></sub>
+    </td>
+    <td align="center">
+      <img src="/doc/img/uaE_Status.png" width="100%"><br>
+      <sub><b>Status</b></sub>
+    </td>
+    <td align="center">
+      <img src="/doc/img/uaE_Command.png" width="100%"><br>
+      <sub><b>Command</b></sub>
+    </td>
+    <td align="center">
+      <img src="/doc/img/uaE_Action.png" width="100%"><br>
+      <sub><b>Action</b></sub>
+    </td>
+  </tr>
+</table>  
+
 
 # Beispielsvideo zur Steuerung der Visualisierung
 ![Visualisierung Codesys](/doc/img/Visualisierung_Codesys.png)
