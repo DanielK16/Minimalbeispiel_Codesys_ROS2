@@ -220,12 +220,13 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 |int16|INT|
 |string|STRING|
 
-## Aufbau des OPC UA Adressraums für mycobt Visualisierung
-
+## Aufbau des OPC UA Adressraums für mycobot Visualisierung
+ ![UA expert base](/doc/img/uaE_Base.png)  ![Ua expert Status](/doc/img/uaE_Status.png)  ![UA expert command](/doc/img/uaE_Command.png)  ![UA Expert Action](/doc/img/uaE_Action.png)
 
 # Beispielsvideo zur Steuerung der Visualisierung
 ![Visualisierung Codesys](/doc/img/Visualisierung_Codesys.png)
-
+## Manuelle Steuerung
 ![mycobot manuelle Steuerung](/doc/vid/mycobot_manuelle_steuerung.gif)
+## Automatik Steuerung mit Bahnplanung durch MoveIt
 
 </details>  
