@@ -60,27 +60,27 @@ async def async_main(args=None):
 
         # Pos_Axis 
         axis_nodes = {
-            "axis_0": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfJOk="),
-            "axis_1": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfJek="),
-            "axis_2": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfJuk="),
-            "axis_3": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfJ+k="),
-            "axis_4": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfIOk="),
-            "axis_5": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bCOH2arSFsgPAfIek="),
+            "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_0"),
+            "axis_1": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_1"),
+            "axis_2": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_2"),
+            "axis_3": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_3"),
+            "axis_4": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_4"),
+            "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_5"),
         }
 
         # Pos_TCP
         tcp_nodes = {
-            "trans_x": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH9zJ1h/AfbOk="),
-            "trans_y": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH9zJ1h/Afbek="),
-            "trans_z": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH9zJ1h/Afbuk="),
-            "rot_x": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH8S9gtvtA"),
-            "rot_y": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH8S9gtvpA"),
-            "rot_z": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH8S9gtvlA"),
-            "rot_w": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx9MvZ7bXA0TH8S9gtvRA")
+            "trans_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.trans_x"),
+            "trans_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.trans_y"),
+            "trans_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.trans_z"),
+            "rot_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_x"),
+            "rot_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_y"),
+            "rot_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_z"),
+            "rot_w": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_w")
         }
 
         # Watchdog Variable erhöhren
-        watchdog_node = client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3E2CI9zVnx/QhYIrrJHuO3CN7nO00cZuD")
+        watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.watchdog_counter")
         watchdog_counter = 0
 
         try:

@@ -122,23 +122,23 @@ async def async_main(args=None):
         # --- OPC UA KNOTEN FÜR STEUERUNG ---
         # erwartet 0 1 oder -1
         axis_direction_nodes = {
-            0: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrccBQ="),
-            1: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrccRQ="),
-            2: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrcchQ="),
-            3: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrccxQ="),
-            4: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrcdBQ="),
-            5: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrcdRQ="),
+            0: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_0"),
+            1: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_1"),
+            2: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_2"),
+            3: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_3"),
+            4: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_4"),
+            5: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_5"),
         }
 
         # Velocity
-        global_velocity_node = client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x/UleIbgKWCQgw==")
+        global_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.velocity")
 
         # 3. Watchdog Node für CODESYS
-        watchdog_node = client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja03dZ3gKHCG5B93hvYuYIzxQA==")
+        watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.watchdog_counter")
         watchdog_counter = 0
 
         # Enable Node
-        enable_node = client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0leojhLHHp")
+        enable_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.enable")
         current_enable_status = False
 
         try:
