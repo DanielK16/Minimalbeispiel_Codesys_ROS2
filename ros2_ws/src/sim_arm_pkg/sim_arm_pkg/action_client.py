@@ -437,7 +437,6 @@ class ROSNode(Node):
 
         if not goal_handle.accepted:
             self.get_logger().info('Goal rejected')
-            rclpy.shutdown()
             return
 
         self.get_logger().info('Goal accepted')
@@ -556,7 +555,7 @@ async def async_main(args=None):
 
                     except Exception as e:
                         ros_node.get_logger().error(f"Fehler beim Lesen der Action-Daten: {e}")
-                        raise
+                        continue
 
                     goal_msg = ros_node.create_goal(
                         pipeline_id=MotionType,
