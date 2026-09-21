@@ -120,7 +120,7 @@ async def async_main(args=None):
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
         # --- OPC UA KNOTEN FÜR STEUERUNG ---
-        # 1. Achsen-Richtungs-Nodes (Erwartet -1, 0 oder +1 aus CODESYS pro Achse)
+        # erwartet 0 1 oder -1
         axis_direction_nodes = {
             0: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrccBQ="),
             1: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrccRQ="),
@@ -130,7 +130,7 @@ async def async_main(args=None):
             5: client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x+I4fZrcdRQ="),
         }
 
-        # 2. EINZIGER Velocity-Node für den globalen Schieberegler
+        # Velocity
         global_velocity_node = client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx9Evdob3A3uE7iF6ja0hbIDwH2eM8TZ7x/UleIbgKWCQgw==")
 
         # 3. Watchdog Node für CODESYS
@@ -165,7 +165,7 @@ async def async_main(args=None):
                     watchdog_counter = (watchdog_counter + 1) % 32767
                     await watchdog_node.set_value(int(watchdog_counter), ua.VariantType.Int16)
                 except Exception as e:
-                    ros_node.get_logger().warn(f"⚠️ Watchdog Fehler: {e}")
+                    ros_node.get_logger().warn(f" Watchdog Fehler: {e}")
 
                 # Globale Geschwindigkeit und Richtungen auslesen und verrechnen
                 try:

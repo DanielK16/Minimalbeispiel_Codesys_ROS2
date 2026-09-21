@@ -95,7 +95,7 @@ async def async_main(args=None):
                     watchdog_counter = (watchdog_counter + 1) % 32767  # Zählt von 0 bis 32766 hoch
                     await watchdog_node.set_value(int(watchdog_counter), ua.VariantType.Int16)
                 except Exception as e:
-                    ros_node.get_logger().warn(f"⚠️ Watchdog konnte nicht gesendet werden: {e}")
+                    ros_node.get_logger().warn(f" Watchdog konnte nicht gesendet werden: {e}")
 
                 # Joint States schreiben
                 if ros_node.current_joint_states is not None:
@@ -121,7 +121,7 @@ async def async_main(args=None):
                             await axis_nodes["axis_5"].set_value(float(pos_val), ua.VariantType.Double)
 
                 except Exception as e:
-                    ros_node.get_logger().warn(f"⚠️ Fehler beim Schreiben von /joint_states: {e}")
+                    ros_node.get_logger().warn(f" Fehler beim Schreiben von /joint_states: {e}")
 
                 # ---- TCP POSE SCHREIBEN ----
                 if ros_node.current_tcp_pose is not None:
@@ -137,7 +137,7 @@ async def async_main(args=None):
                         await tcp_nodes['rot_z'].set_value(float(p_msg.orientation.z), ua.VariantType.Double)
                         await tcp_nodes['rot_w'].set_value(float(p_msg.orientation.w), ua.VariantType.Double)
                     except Exception as e:
-                        ros_node.get_logger().warn(f"⚠️ Fehler beim Schreiben von /tcp_pose: {e}")
+                        ros_node.get_logger().warn(f" Fehler beim Schreiben von /tcp_pose: {e}")
                 
                 # Kurze Pause für die CPU (bestimmt auch den Takt des Watchdogs)
                 await asyncio.sleep(0.1)
