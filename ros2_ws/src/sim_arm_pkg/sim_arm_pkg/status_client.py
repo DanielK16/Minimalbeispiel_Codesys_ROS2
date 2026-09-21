@@ -84,7 +84,7 @@ async def async_main(args=None):
         watchdog_counter = 0
 
         try:
-            # Die asynchrone Hauptschleife
+            # Hauptschleife
             while rclpy.ok():
                 
                 # ROS Callbacks verarbeiten
@@ -139,7 +139,7 @@ async def async_main(args=None):
                     except Exception as e:
                         ros_node.get_logger().warn(f" Fehler beim Schreiben von /tcp_pose: {e}")
                 
-                # Kurze Pause für die CPU (bestimmt auch den Takt des Watchdogs)
+                # Kurze Pause für die CPU 
                 await asyncio.sleep(0.1)
                 
         except KeyboardInterrupt:

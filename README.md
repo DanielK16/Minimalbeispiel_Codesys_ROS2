@@ -278,6 +278,7 @@ Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw.
 
 
 # 4. Adressraum OPC UA
+https://www.youtube.com/watch?v=Ahd34XcDj9I&t=216s
 Es gibt zwei Möglichkeiten einen OPC Server zu erstellen mithilfe Codesys.  
 Ab Codesys V3.5 SP18 empfiehlt CODESYS die Verwendung des Konfigurationseditors IEC Symbolkonfiguration.
 * Möglichkeit 1: Verwendung Kommunikationsverwalter + Symbolgruppe:  
