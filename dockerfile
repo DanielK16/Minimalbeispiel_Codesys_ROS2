@@ -7,7 +7,7 @@
 ########################################
 # Basis Image für ros2 jazzy mit desktop anwendungen (rviz2, gazebo ,rqt)
 ########################################
-ARG ROS_DISTRO=jazzy
+ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop-full
 # muss nach FROM nochmals deklariert werden da sonst nicht gültig 
 ARG ROS_DISTRO
@@ -64,7 +64,7 @@ RUN pip3 install asyncua --ignore-installed cryptography
 
 # ROS2 packages installieren
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y ros-humble-pick-ik
+    apt-get install -y ros-{ROS_DISTRO}-pick-ik
 ########################################
 # USER ros Umgebung einrichten
 ########################################

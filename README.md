@@ -56,12 +56,12 @@ git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
 Im Github liegt ein Dockerfile ab unter /Minimalbeispiel_Codesys_ROS2
 Passe `--build-arg` an, ob ROS 2 **Humble** oder **Jazzy** benötigt wird:
 ```
-docker build -t --build-arg ROS_DISTRO=humble <image_name> .
+docker build -t <image_name> --build-arg ROS_DISTRO=humble .
 ```
 
 3. Image -> Container
-eventuell -v anpassen je nachdem wohin github gecloned wurde!
-**auf Pfad achten -v!**
+eventuell -v anpassen je nachdem wohin github gecloned wurde!  
+**auf Pfad achten -v!**  
 ```
 docker run -it \
   --name minimalbsp_ros2_codesys \
@@ -77,7 +77,8 @@ docker run -it \
 ```
 4. Container starten mit:
 ```
-docker exec -it <image_name> bash
+docker start <container_name>
+docker exec -it <container_name> bash
 ```
 
 4. Codesys Projekt öffnen und mit Deploy Tool Container einrichten
@@ -87,12 +88,11 @@ Die Einrichtung mit dem Deploy Tool ist weiter unten ausführlich erklärt
 ```
 sudo apt update
 sudo apt upgrade -y
-cd ros2_ws
+cd ~/ros2_ws
 rosdep init
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 colcon build
-cd src
 source install/setup.bash
 ```
 </details>
@@ -117,7 +117,7 @@ Für Datenaustausch zwischen ROS2 und Codesys gibt es generell 3 Möglichkeiten:
 - Shared Memory (IPC) -> z.B: ROBIN Projekt
 - Feldbusse (ModbusTCP, EtherCAT, ...)
 - Netzwerkprotokolle (OPC UA, MQTT, rosbridge)
-Entschieden für OPC UA, da industrieller Standard und "einfach" zu implementieren.
+Entschieden für OPC UA, da industrieller Standard.
 
 ![Datenaustausch ROS2 und Codesys](/doc/img/Datenaustausch_Codesys_ROS2.png)
 Die Topics aus ROS2 werden auf Structs in Codesys gemapped mit diesen dann der Adressraum aufgebaut wird.
@@ -166,7 +166,8 @@ Folgende Tools sind mit dem **Codesys Install Manager** zu installieren:
 SSH muss installiert und aktiviert sein unter WSL:
 ```bash
 sudo apt update && sudo apt install -y openssh-server
-service ssh start
+sudo service ssh start
+sudo service ssh status
 ``` 
 ![Einloggen in Codesys](/doc/img/einloggen_ssh_codesys.png)
 
@@ -210,7 +211,7 @@ Aufteilung der OPC UA Kommunikation in drei OPC Clients.
 **RobotCommand Client**:
 ist für den Datenaustausch Codesys -> ROS2 verantwortlich. Dabei soll der Roboter manuell angesteuert werden. 
 **RobotAction Client**:
-ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über MoveIt an!  
+ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über MoveIt an! Dafür wird ein Action Client erstellt auf die /move_action.  
 
 ## c: Variablentypen ROS2 und IEC 61131-3
 |**ROS2**|**IEC 66131-3**|
@@ -221,6 +222,15 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 |int32|DINT|
 |int16|INT|
 |string|STRING|
+
+## Launch der ros2 Dateien
+Zuerst in Codesys einloggen, dann ros2 launch!
+```
+cd ~/ros2_ws
+source install/setup.bash
+ ros2 launch sim_arm_pkg mycobot_launch.py 
+ros2 launch sim_arm_pkg communication_launch.py 
+```
 
 ## Aufbau des OPC UA Adressraums für mycobot Visualisierung  
 
@@ -259,8 +269,8 @@ Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw.
 
 * **Pilz Industrial Motion Planner:**
   * Ermöglicht die Bahnplanung ebenfalls wahlweise im Gelenk- oder im kartesischen Raum.
-  * Unterstützt die standardisierten Bewegungsprimitive PTP (*Point-to-Point*), LIN (*Linear*) und CIR (*Circular*).
-  * *Hinweis zum Implementierungsstatus:* Während PTP- und LIN-Bewegungen bereits fehlerfrei ausgeführt werden können, befindet sich die zirkulare Interpolation (CIR) aktuell noch in der Implementierungsphase und ist noch nicht vollständig funktionsfähig.  
+  * Unterstützt die standardisierten PTP (*Point-to-Point*), LIN (*Linear*) und CIR (*Circular*).
+  * *Hinweis zum Implementierungsstatus:* PTP Bewegungen funktionieren oft fehlerfrei. LIN Bewegungen erfordern noch nicht zu komplett. CIRC muss noch implementiert werden
   * LIN schlägt häufiger fehl da mit 6 achsen nicht jede position linear angefahren werden kann! Orientierung muss übereinstimmen!
 
 

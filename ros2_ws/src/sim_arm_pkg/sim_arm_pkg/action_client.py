@@ -359,6 +359,7 @@ class ROSNode(Node):
 
     def create_pilz_circ_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, trans_x, trans_y, trans_z, rot_x, rot_y, rot_z, rot_w, position_tolerance, orientation_tolerance):
         # to do!
+        # center punkt definieren für
         pass
 
     def create_goal(

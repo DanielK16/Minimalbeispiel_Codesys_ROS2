@@ -14,5 +14,11 @@ codesys/*.bootinfo_guids
 codesys/*.compileinfo
 codesys/*.xml
 
+# alte Codesys projekte
+codesys/Simulation_V2_OOP.project
+codesys/Simulation_Arm_ROS2_COD_OOP.project
+codesys/Simulation_Arm_ROS2_Codesys.project
+codesys/Simulation_V3.project
+
 # old code folder
 old_code/
