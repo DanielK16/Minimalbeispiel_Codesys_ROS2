@@ -256,7 +256,7 @@ ros2 launch sim_arm_pkg communication_launch.py
 </table>  
 
 # Beispielsvideo zur Steuerung der Visualisierung
-![Visualisierung Codesys](/doc/img/Visualisierung_Codesys.png)
+![Visualisierung Codesys](/doc/img/Visualisierung_Codesys2.png)
 ## Manuelle Steuerung
 ![mycobot manuelle Steuerung](/doc/vid/mycobot_manuelle_steuerung.gif)
 
@@ -272,6 +272,6 @@ Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw.
   * Unterstützt die standardisierten PTP (*Point-to-Point*), LIN (*Linear*) und CIR (*Circular*).
   * *Hinweis zum Implementierungsstatus:* PTP Bewegungen funktionieren oft fehlerfrei. LIN Bewegungen erfordern noch nicht zu komplett. CIRC muss noch implementiert werden
   * LIN schlägt häufiger fehl da mit 6 achsen nicht jede position linear angefahren werden kann! Orientierung muss übereinstimmen!
-
+  * Bei LIN Scaling auf ca. 0.005
 
 </details>  
