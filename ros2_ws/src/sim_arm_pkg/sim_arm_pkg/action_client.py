@@ -31,7 +31,7 @@ class ROSNode(Node):
         self._action_client.wait_for_server()
         self.get_logger().info('Action Server gefunden')
 
-    def create_ompl_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5, joint_tolerance_above = 0.01, joint_tolerance_below=0.01):
+    def create_ompl_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5, joint_tolerance = 0.01):
         goal_msg = MoveGroup.Goal()
 
         goal_msg.request.pipeline_id = 'ompl'
@@ -48,48 +48,48 @@ class ROSNode(Node):
         joint_constraints.append(JointConstraint(
             joint_name='joint2_to_joint1',
             position=axis_0,
-            tolerance_above=joint_tolerance_above,
-            tolerance_below=joint_tolerance_below,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint3_to_joint2',
             position=axis_1,
-            tolerance_above=joint_tolerance_above,
-            tolerance_below=joint_tolerance_below,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint4_to_joint3',
             position=axis_2,
-            tolerance_above=joint_tolerance_above,
-            tolerance_below=joint_tolerance_below,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint5_to_joint4',
             position=axis_3,
-            tolerance_above=joint_tolerance_above,
-            tolerance_below=joint_tolerance_below,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint6_to_joint5',
             position=axis_4,
-            tolerance_above=joint_tolerance_above,
-            tolerance_below=joint_tolerance_below,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint6output_to_joint6',
             position=axis_5,
-            tolerance_above=joint_tolerance_above,
-            tolerance_below=joint_tolerance_below,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
@@ -164,7 +164,7 @@ class ROSNode(Node):
 
         return goal_msg
 
-    def create_pilz_ptp_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5):
+    def create_pilz_ptp_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5, joint_tolerance):
         goal_msg = MoveGroup.Goal()
 
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
@@ -184,48 +184,48 @@ class ROSNode(Node):
         joint_constraints.append(JointConstraint(
             joint_name='joint2_to_joint1',
             position=axis_0,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint3_to_joint2',
             position=axis_1,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint4_to_joint3',
             position=axis_2,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint5_to_joint4',
             position=axis_3,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint6_to_joint5',
             position=axis_4,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
         joint_constraints.append(JointConstraint(
             joint_name='joint6output_to_joint6',
             position=axis_5,
-            tolerance_above=0.05,
-            tolerance_below=0.05,
+            tolerance_above=joint_tolerance,
+            tolerance_below=joint_tolerance,
             weight=1.0
         ))
 
@@ -386,12 +386,13 @@ class ROSNode(Node):
         velocity_scaling=0.2,
         acceleration_scaling=0.2,
         position_tolerance=0.05,
-        orientation_tolerance=0.05
+        orientation_tolerance=0.05,
+        joint_tolerance=0.01
     ):
         if pipeline_id == "pilz_industrial_motion_planner":
             if planner_id == "PTP":
                 if Joint_Goal:
-                    return self.create_pilz_ptp_joint_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,axis_0,axis_1,axis_2,axis_3,axis_4,axis_5)
+                    return self.create_pilz_ptp_joint_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,axis_0,axis_1,axis_2,axis_3,axis_4,axis_5, joint_tolerance)
                 elif TCP_Goal:
                     return self.create_pilz_ptp_tcp_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
                 else:
@@ -410,7 +411,7 @@ class ROSNode(Node):
 
         elif pipeline_id == "ompl":
             if Joint_Goal:
-                return self.create_ompl_joint_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,axis_0,axis_1,axis_2,axis_3,axis_4,axis_5)
+                return self.create_ompl_joint_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,axis_0,axis_1,axis_2,axis_3,axis_4,axis_5, joint_tolerance)
 
             elif TCP_Goal:
                 return self.create_ompl_tcp_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
@@ -494,6 +495,7 @@ async def async_main(args=None):
             planningattempts_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.num_planning_attempts")
             planningtime_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.allowed_planning_time")
             positiontolerance_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.position_tolerance")
+            jointtolerance_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.joint_tolerance")
             rot_x_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_x")
             rot_y_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_y")
             rot_z_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_z")
@@ -544,6 +546,7 @@ async def async_main(args=None):
                         planning_attempts = await planningattempts_node.read_value()
                         planning_time = await planningtime_node.read_value()
                         position_tolerance = await positiontolerance_node.read_value()
+                        joint_tolerance = await jointtolerance_node.read_value()
                         rot_x = await rot_x_node.read_value()
                         rot_y = await rot_y_node.read_value()
                         rot_z = await rot_z_node.read_value()
@@ -587,7 +590,8 @@ async def async_main(args=None):
                         rot_w=rot_w,
 
                         position_tolerance=position_tolerance,
-                        orientation_tolerance=orientation_tolerance
+                        orientation_tolerance=orientation_tolerance,
+                        joint_tolerance = joint_tolerance
                     )
 
                     ros_node.send_goal(goal_msg)

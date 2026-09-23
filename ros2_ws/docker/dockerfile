@@ -64,8 +64,10 @@ RUN pip3 install asyncua --ignore-installed cryptography
 
 # ROS2 packages installieren
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y ros-${ROS_DISTRO}-pick-ik
+    apt-get install -y ros-${ROS_DISTRO}-pick-ik \
+    ros-${ROS_DISTRO}-moveit-py \
     && rm -rf /var/lib/apt/lists/*
+    
 ########################################
 # USER ros Umgebung einrichten
 ########################################

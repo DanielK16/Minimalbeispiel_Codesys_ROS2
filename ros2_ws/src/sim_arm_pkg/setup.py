@@ -33,7 +33,8 @@ setup(
             'tcp_pose = sim_arm_pkg.tcp_pose:main',
             'status_client = sim_arm_pkg.status_client:main',
             'command_client = sim_arm_pkg.command_client:main',
-            'action_client = sim_arm_pkg.action_client:main'
+            'action_client = sim_arm_pkg.action_client:main',
+            'action_client_moveitpy = sim_arm_pkg.action_client_moveitpy:main'
         ],
     },
 )

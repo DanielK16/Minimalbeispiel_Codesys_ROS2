@@ -41,7 +41,6 @@ def generate_launch_description():
 
     # Standard MoveIt Demo-Launch generieren (startet move_group, rviz, robot_state_publisher etc.)
     demo_launch_description = generate_demo_launch(moveit_config)
-
     # Servo-Node zur gemeinsamen Launch-Beschreibung 
     demo_launch_description.add_action(servo_node)
 
