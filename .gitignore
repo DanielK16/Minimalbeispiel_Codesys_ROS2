@@ -3,6 +3,8 @@ ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
 ros2_ws/src/ros_tutorials
+ros2_ws/src/Universal_Robots_ROS2_Driver
+ros2_ws/src/Universal_Robots_ROS2_Description
 
 
 # Codesys 

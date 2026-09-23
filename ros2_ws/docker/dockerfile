@@ -64,7 +64,8 @@ RUN pip3 install asyncua --ignore-installed cryptography
 
 # ROS2 packages installieren
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y ros-{ROS_DISTRO}-pick-ik
+    apt-get install -y ros-${ROS_DISTRO}-pick-ik
+    && rm -rf /var/lib/apt/lists/*
 ########################################
 # USER ros Umgebung einrichten
 ########################################
@@ -84,6 +85,9 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 # standardmäßig root als user
 # ros user wird über docker run engestellt mit --user ros
 USER root
+
+# WORKDIR /home/ros/ros2_ws
+# ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash && source install/setup.bash && python3 docker/entrypoint.py"]
 
 # Standard-Befehl beim Start des Containers welches programm er öffnen soll!
 CMD ["bash"]

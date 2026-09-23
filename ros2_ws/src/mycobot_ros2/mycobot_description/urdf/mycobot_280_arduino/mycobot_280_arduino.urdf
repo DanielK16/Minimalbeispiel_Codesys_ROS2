@@ -19,7 +19,7 @@
     </collision>
   </link>
 
-  <link name="joint1">
+  <link name="joint1">v
     <visual>
       <geometry>
 	     <!--- 0.0 0 -0.04  1.5708 3.14159-->
