@@ -1,19 +1,21 @@
-###############################################################################
-# MoveIt Servo Konfiguration für myCobot / firefighter
-###############################################################################
+# MoveIt Servo Konfiguration für myCobot 
+# übernommen von https://github.com/xArm-Developer/xarm_ros2/blob/humble/xarm_moveit_servo/config/xarm_moveit_servo_config.yaml und angepasst
 
-use_gazebo: false # Auf true setzen, wenn du in Gazebo simulierst
+# Gazebo Simulation
+use_gazebo: false 
 
-# Art des Eingangssignals ("speed_units" erwartet Geschwindigkeiten in m/s bzw. rad/s)
+# Einheit der eingehenden Signale
 command_in_type: "speed_units"
 scale:
   linear: 0.2        # Max. lineare Geschwindigkeit (m/s)
   rotational: 0.2    # Max. rotatorische Geschwindigkeit (rad/s)
   joint: 0.4         # Max. Gelenkgeschwindigkeit (rad/s)
 
-# Filter- und Glättungsparameter (verhindert harte Ruckler)
+# Einheit von ausgehenden Signalen
 publish_period: 0.033  # Frequenz, mit der Servo Befehle sendet (ca. 30 Hz)
-low_pass_filter_coeff: 2.0
+low_latency_mode: true  # Publishe sobald eine neue Twist msg ankommt (publish_period wird ignoriert)
+low_pass_filter_coeff: 2.0  # Larger --> trust the filtered data more, trust the measurements less.
+
 
 # --- ROBOTER & GRUPPEN ---
 move_group_name: "arm_group"              
@@ -30,34 +32,35 @@ joint_names:
   - joint6_to_joint5
   - joint6output_to_joint6
 
-# --- EINGANGS- & AUSGANGS-TOPICS ---
+# Ein- und Ausgangstopics
 cartesian_command_in_topic: "/servo_node/delta_twist_cmds"
 joint_command_in_topic: "/servo_node/delta_joint_cmds"
 command_out_topic: "/arm_group_controller/joint_trajectory"
 
-# NEU: Servo MUSS wissen, welches Nachrichtenformat der Controller erwartet
+# Ausgangstyp
 command_out_type: "trajectory_msgs/JointTrajectory"
 
-# NEU: Servo MUSS wissen, woher die aktuellen Roboterpositionen kommen
+
+
+# joint topic
 joint_topic: "/joint_states"
 joint_state_update_delay: 0.05 # Toleranz für verzögerte Joint States (in s)
 
-# NEU: Was soll in die Trajektorie geschrieben werden?
+# Was soll alles gepublished werden
 publish_joint_positions: true
 publish_joint_velocities: false
 publish_joint_accelerations: false
 
-# --- SICHERHEIT & KOLLISIONEN ---
+# Kollisionen
 check_collisions: true              # Echtzeit-Kollisionsprüfung aktivieren!
 collision_check_rate: 10.0          # Prüfrate in Hz
 self_collision_proximity_threshold: 0.01 # Abstand in Metern, ab dem gewarnt wird
 scene_collision_proximity_threshold: 0.02
 
-# NEU: Zwingend erforderlich für Singularitäts-Vermeidung
-# lower_singularity_threshold: 17.0
-# hard_singularity_threshold: 30.0
+# Singularitäten und Joint Limits
+# lower_singularity_threshold: 17.0  # Start decelerating when the condition number hits this (close to singularity)
+# hard_singularity_threshold: 30.0  # Stop when the condition number hits this
 singularity_threshold: 0.01
 joint_limit_margin: 0.1 # [rad] Sicherheitsabstand zu den mechanischen Gelenk-Limits
 
-# NEU: Erlaubt Servo, die Planning Scene (Kollisionsobjekte) mitzulesen
 is_primary_planning_scene_monitor: true

@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-# ==============================================================================
-# Quellen & Referenzen:
-# - GitHub MoveIt 2: https://github.com/ros-planning/moveit2
-# - Deep Wiki: https://wiki.ros.org/moveit 
-# - AsyncUA (OPC UA): https://github.com/FreeOpcUa/opcua-asyncio
-# ==============================================================================
+# Daniel Körper
+# Quellen:
+# für dieses Programm wurde zur Fehlersuche auf Gemini Pro zurückgegriffen und Code wurde anschließend überprüft
+# https://deepwiki.com/moveit/moveit2 inkl der dort eingebauten AI
 
 import time
 import rclpy
@@ -16,7 +13,6 @@ from moveit.core.kinematic_constraints import construct_joint_constraint, constr
 from geometry_msgs.msg import Pose
 from moveit_msgs.msg import Constraints, PositionConstraint
 from shape_msgs.msg import SolidPrimitive
-
 
 import asyncio
 from asyncua import Client, ua
@@ -30,7 +26,7 @@ class ROSNode(Node):
         # Error Code initialisieren 
         self.error_code = 0
 
-        # MoveItPy Instanzen 
+        # MoveItPy Instanziieren
         self.myCobot = MoveItPy(node_name="action_client")
         self.myCobotArm = self.myCobot.get_planning_component("arm_group")
         self.planning_scene_monitor = self.myCobot.get_planning_scene_monitor()
@@ -87,7 +83,7 @@ class ROSNode(Node):
         robot_model = self.myCobot.get_robot_model()
         robot_state = RobotState(robot_model)
         
-        # Aktuellen Zustand übernehmen, dann gewünschte Joints überschreiben
+        # Aktuellen Zustand übernehmen und gewünschte Joints überschreiben
         robot_state.joint_positions = joint_values
         
         joint_constraint = construct_joint_constraint(

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="Projektarbeit_WS2627_Koerper" company="" webLink="http://" view-date="2026-08-31" view-index="0" gantt-divider-location="604" resource-divider-location="300" version="3.3.3316" locale="de_DE">
+    <description><![CDATA[Projektarbeit an der TH Mannheim zum Thema ROS2 und Codesys]]></description>
+    <view zooming-state="default:7" id="gantt-chart">
+        <field id="tpd3" name="Vorgang" width="472" order="0"/>
+        <field id="tpd4" name="Anfang" width="10" order="1"/>
+        <field id="tpd5" name="Ende" width="106" order="2"/>
+        <field id="tpd15" name="Notizen" width="20" order="3"/>
+        <option id="filter.completedTasks" value="false"/>
+        <option id="filter.dueTodayTasks" value="false"/>
+        <option id="filter.overdueTasks" value="false"/>
+        <option id="filter.inProgressTodayTasks" value="false"/>
+        <timeline><![CDATA[5]]></timeline>
+        <option id="color.recent"><![CDATA[#0000ff #ff0000 #00ff00 #ffff33 #66ffff]]></option>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Ressource" width="210" order="0"/>
+        <field id="1" name="Rolle" width="86" order="1"/>
+    </view>
+    <!-- -->
+    <calendars>
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="1" mon="0" tue="0" wed="0" thu="0" fri="0" sat="1"/>
+            <only-show-weekends value="true"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="11" uid="c74e9549437743cea3316666515bc387" name="Phase 1: Recherche + Entwicklungsumgebung" color="#00ff00" meeting="false" start="2026-08-31" duration="8" complete="100" expand="true">
+            <notes><![CDATA[- Erstellen Quellverzeichnis -> Zotero
+- Aufbau Entwicklungsumgebung
+]]></notes>
+            <task id="0" uid="4851228c43af49d4ab43b84c72fa88b5" name="Recherche" color="#00ff00" meeting="false" start="2026-08-31" duration="8" complete="100" expand="true">
+                <notes><![CDATA[Recherche zu folgenden Themen:
+- OPC-UA
+- Bridge zwischen ROS2 und Codesys
+- Entwicklungsumgebung
+etc....
+]]></notes>
+            </task>
+            <task id="1" uid="19cf417081254e87b5adb501f900ed97" name="Aufbau Entwicklungsumgebung" color="#00ff00" meeting="false" start="2026-08-31" duration="8" complete="100" expand="true">
+                <notes><![CDATA[Entwicklungsumgebung aufbauen
+Designentscheidungen treffen]]></notes>
+                <depend id="3" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="2" uid="6b1b6741639f4f729f0b36be541bba56" name="Meeting Projekt_Recap" color="#ff0000" meeting="true" start="2026-09-08" duration="0" complete="0" priority="4" expand="true">
+                <notes><![CDATA[Meeting um 10:00 Uhr in WebEx]]></notes>
+            </task>
+            <task id="15" uid="b13fd4e90b334ccdb4155f9928242fa4" name="Minimalbeispiel ROS2 - Codesys" color="#00ff00" meeting="true" start="2026-09-08" duration="0" complete="100" expand="true">
+                <notes><![CDATA[Minimalbeispiel für Kommunikation zwischen ROS2 und Codesys in Entwicklungsumgebung
+z.B. Topic Counter]]></notes>
+            </task>
+        </task>
+        <task id="12" uid="fc615daba73b4a78bbb93f4976ee3e07" name="Phase 2: Simulation Roboterarm" color="#0000ff" meeting="false" start="2026-09-08" duration="39" complete="63" expand="true">
+            <task id="3" uid="7570ef1ba966415985882c969c21397b" name="Simulation Roboterarm" color="#0000ff" meeting="false" start="2026-09-08" duration="18" complete="80" expand="true">
+                <notes><![CDATA[RVIZ, Gazebo, 
+eigene URDF bauen
+MoveIt2 einrichten
+Kleiner Test!
+]]></notes>
+            </task>
+            <task id="17" uid="9e7d7498385b42a68c5fb5850b6409ba" name="Schnittstelle ROS2 -&gt; Codesys läuft auf mycobot280 zugeschnitten" color="#0000ff" meeting="true" start="2026-09-11" duration="0" complete="100" expand="true">
+                <notes><![CDATA[URDF + rviz config
+]]></notes>
+            </task>
+            <task id="5" uid="ea1bbff337494f8eb78de8e3e88f8ee4" name="Kapitel_1 geschrieben" color="#0000ff" meeting="true" start="2026-09-14" duration="0" complete="100" priority="2" expand="true">
+                <notes><![CDATA[Einleitung
+  Problemumfeld
+  Stand der Technik 
+  Aufgaben und Ziele
+  Struktur der Arbeit]]></notes>
+            </task>
+            <task id="18" uid="4903848f7aac44d5aaeb30dc13f599fd" name="Schnittstelle Codesys -&gt; ROS2 für mycobot280 mit moveit" color="#0000ff" meeting="true" start="2026-09-17" duration="0" complete="0" expand="true"/>
+            <task id="19" uid="7aec9dfe0da84c33aee164a6e7734ee3" name="Schnittstelle OPC UA intergriert" color="#0000ff" meeting="true" start="2026-09-18" duration="0" complete="0" expand="true">
+                <notes><![CDATA[Schnittstelle zwischen ROS2 und Codesys für Simulation integriert
+]]></notes>
+            </task>
+            <task id="21" uid="894b378f6c3d4a5a84e714e950032c0b" name="Meeting Projekt_Recap" color="#ff0000" meeting="true" start="2026-09-22" duration="0" complete="0" expand="true">
+                <notes><![CDATA[10 Uhr online in WEBEX!]]></notes>
+            </task>
+            <task id="20" uid="be3715a965e8424aa82113dc2fd27ef1" name="Kapitel 2 geschrieben" color="#0000ff" meeting="true" start="2026-09-24" duration="0" complete="0" expand="true">
+                <notes><![CDATA[Grundlagen ROS2
+Grundlagen OPC UA
+Beschreibung des Minimalbeispiels TurtleSim
+]]></notes>
+            </task>
+            <task id="23" uid="8186a5d5a5ac44259010cf00ffc987dd" name="Dokumentation Simulation (GitHub + Bericht)" color="#0000ff" meeting="false" start="2026-10-09" duration="8" complete="25" expand="true"/>
+            <task id="22" uid="dfbfdb63580f479a9735cd0bf261589b" name="Doku + GitHub für Simulation" color="#0000ff" meeting="true" start="2026-10-17" duration="0" complete="0" expand="true">
+                <notes><![CDATA[Doku erstellen für Simulation 
+]]></notes>
+            </task>
+            <task id="25" uid="a10509b026554691a3400473328cde0d" name="SoftKeys in Codesys einfügen" color="#0000ff" meeting="true" start="2026-10-13" duration="0" complete="0" expand="true">
+                <notes><![CDATA[Start von RVIz2 und der Clients aus Codesys aus
+python3 entrypoint.py muss davor gestartet werden!
+]]></notes>
+            </task>
+            <task id="24" uid="1d43bd57826c44baafa8224f3ebe64ab" name="neuen Roboter Testweise einbinden!" color="#0000ff" meeting="true" start="2026-10-13" duration="0" complete="0" expand="true">
+                <notes><![CDATA[neuen Roboter (6 achsig) testweise einbinden.
+Beschreiben was dafür alles geändert werden muss!
+z.B. mit xArm6]]></notes>
+            </task>
+        </task>
+        <task id="13" uid="aeaec0cb4a4d490b8e94d6e9af30c2cd" name="Phase 3: Turtlebot4 im Labor" color="#ffff33" meeting="false" start="2026-10-17" duration="26" complete="0" expand="true">
+            <task id="9" uid="581a4aaa14b44358ad470e27237e5d60" name="Einarbeitung Turtlebot4 im Labor" color="#ffff33" meeting="false" start="2026-10-17" duration="7" complete="0" expand="true">
+                <notes><![CDATA[Minimalbeispiel zur Steuerung mithilfe von Nav2
+Minimalbeispile Kommunikation Codesys ROS2 Turtulebot
+]]></notes>
+                <depend id="10" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="10" uid="9b28c12de9bf469d8e5e2df90fbdbe5c" name="Turtlebot + Codesys Steuerung" color="#ffff33" meeting="false" start="2026-10-24" duration="19" complete="0" expand="true"/>
+        </task>
+        <task id="6" uid="7b9fd185a82e43ca8064bb316872419c" name="Kanada" color="#66ffff" meeting="false" start="2026-09-25" duration="14" complete="100" expand="true">
+            <depend id="23" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="8" uid="4efa6c929bca4c7ab47baa6fb27ae099" name="OP Knie" color="#66ffff" meeting="false" start="2026-11-27" duration="2" complete="0" expand="true"/>
+    </tasks>
+    <resources/>
+    <allocations/>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+</project>

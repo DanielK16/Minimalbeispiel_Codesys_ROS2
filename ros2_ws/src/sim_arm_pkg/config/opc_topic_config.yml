@@ -1,11 +1,65 @@
-# Definition der topics zum schreiben via opc ua
-# Zwei Informationen sind wichtig für unsere topic bridge
+########## OPC UA Config #############################
 
 OPC_Client:
   ipaddress: "172.25.170.32"
   port: "4840"
-  username: ""  # optional
+  username: ""  # optional / muss noch in code implementiert werden falls
   password: ""  # optional
+
+########## Joint State Names ########################
+
+# Joint State Names für myCobot (topic: /joint_states)
+joint_states:
+  axis_0: joint2_to_joint1            
+  axis_1: joint3_to_joint2
+  axis_2: joint4_to_joint3
+  axis_3: joint5_to_joint4
+  axis_4: joint6_to_joint5
+  axis_5: joint6output_to_joint6
+
+# Joint State Names für xarm6 (topic: /joint_states)
+# joint_states:
+#   axis_0: joint_1            
+#   axis_1: joint_2
+#   axis_2: joint_3
+#   axis_3: joint_4
+#   axis_4: joint_5
+#   axis_5: joint_6
+
+############# Servo Node Config ###############################
+
+# Servo Node für myCobot
+servo_node:
+  start_servo_service: '/servo_node/start_servo'
+  stop_servo_service: '/servo_node/stop_servo'
+  delta_joint_cmd_topic: '/servo_node/delta_joint_cmds'
+
+# Servo Node für xArm6
+# servo_node:
+#   start_servo_service: '/servo_server/start_servo'
+#   stop_servo_service: '/servo_server/stop_servo'
+#   delta_joint_cmd_topic: '/servo_server/delta_joint_cmds'
+
+############# TCP Pose Config ################################
+
+# TCP Pose für myCobot
+tcp_pose:
+  parent_frame: g_base
+  child_frame: joint6_flange
+
+# TCP Pose für xArm6
+# tcp_pose:
+#   parent_frame: link_base
+#   child_frame: link_eef
+
+
+
+
+
+
+
+
+
 
 Subscriber:
   
@@ -32,8 +86,3 @@ Subscriber:
       orientation.z: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTJ7ndw6FA=="
       orientation.w: "ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/cjZLbzL2eMrTJ7ndw3FA=="
 
-
-# Config für Command
-## mapping der joint_axis angeben
-# nodeIds angeben
-# topics servo node angeben

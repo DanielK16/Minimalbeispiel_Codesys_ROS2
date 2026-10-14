@@ -1,6 +1,6 @@
 # Quellen:
 # -https://github.com/moveit/moveit_tutorials/blob/master/doc/pilz_industrial_motion_planner/pilz_industrial_motion_planner.rst#id3
-
+# https://deepwiki.com/moveit/moveit2
 
 import rclpy
 from rclpy.action import ActionClient
@@ -14,6 +14,11 @@ from geometry_msgs.msg import Pose
 import asyncio
 from asyncua import Client, ua
 import logging
+
+# für config file
+import yaml
+with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
+    config = yaml.safe_load(f)
 
 class ROSNode(Node):
     def __init__(self):
@@ -459,8 +464,8 @@ async def async_main(args=None):
     ros_node = ROSNode()
 
     # OPC UA Verbindung
-    ipaddress = "172.25.170.32"
-    port = "4840"
+    ipaddress = config['OPC_Client']['ipaddress']
+    port = config['OPC_Client']['port']
     opc_url = f"opc.tcp://{ipaddress}:{port}"
 
     try:
@@ -485,24 +490,24 @@ async def async_main(args=None):
             PlannerID_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Planner_ID")
             TCPGoal_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.TCP_GOAL")
             accelerationscaling_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.max_acceleration_scaling")
-            axis_0_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.axis_0")
-            axis_1_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.axis_1")
-            axis_2_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.axis_2")
-            axis_3_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.axis_3")
-            axis_4_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.axis_4")
-            axis_5_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.axis_5")
+            axis_0_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_Axis.axis_0")
+            axis_1_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_Axis.axis_1")
+            axis_2_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_Axis.axis_2")
+            axis_3_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_Axis.axis_3")
+            axis_4_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_Axis.axis_4")
+            axis_5_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_Axis.axis_5")
             orientationtolerance_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.orientation_tolerance")
             planningattempts_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.num_planning_attempts")
             planningtime_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.allowed_planning_time")
             positiontolerance_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.position_tolerance")
             jointtolerance_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.joint_tolerance")
-            rot_x_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_x")
-            rot_y_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_y")
-            rot_z_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_z")
-            rot_w_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.rot_w")
-            trans_x_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.trans_x")
-            trans_y_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.trans_y")
-            trans_z_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.trans_z")
+            rot_x_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.rot_x")
+            rot_y_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.rot_y")
+            rot_z_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.rot_z")
+            rot_w_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.rot_w")
+            trans_x_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.trans_x")
+            trans_y_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.trans_y")
+            trans_z_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.trans_z")
             velocityscaling_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.max_velocity_scaling")
 
             # # Watchdog Variable erhöhren

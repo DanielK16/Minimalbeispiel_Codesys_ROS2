@@ -1,4 +1,10 @@
+# Autor: Daniel Körper
+# Quellen:
+# https://docs.python.org/3/library/os.html
+# https://www.geeksforgeeks.org/python/python-os-kill-method/
+# https://docs.python.org/3/library/subprocess.html#module-subprocess
 # Startet den OPCUA Client um die Softkeys aus Codesys zu verwenden!
+
 import subprocess
 import os
 import signal
@@ -6,6 +12,7 @@ import signal
 import asyncio
 from asyncua import Client
 
+# Globale Variablen
 # Verhindern, dass nicht doppelt gestartet wird!
 RViz2_is_running = False
 Communication_Clients_are_running = False
@@ -118,6 +125,7 @@ async def async_main():
             ipaddress = "172.25.170.32"
             port = "4840"
             opc_url = f"opc.tcp://{ipaddress}:{port}"
+
             async with Client(url = opc_url,
                             timeout = 2.0,
                             watchdog_intervall = 0.5, 
@@ -138,15 +146,17 @@ async def async_main():
                     Stop_RViz2_node
                 ]
 
-                # create Subscription
+                # Subscription erstellen
                 handler = SubscriptionHandler()
                 subscription = await client.create_subscription(500, handler)
                 await subscription.subscribe_data_change(nodes)
 
                 while True:
                     await asyncio.sleep(0.1)
+
         except Exception as e:
             print(f"Verbindungsabbruch: {e}")
+            # Warte 5 Sekunden bevor erneutem Versuch!
             await asyncio.sleep(5)
 
 if __name__ == "__main__":
@@ -154,10 +164,9 @@ if __name__ == "__main__":
         asyncio.run(async_main())
     except KeyboardInterrupt:
         print("Str + C gedrückt: Beende alle ROS2 Prozesse")
+    finally:
         stoppe_communication_launch()
         stoppe_RViz2_launch()
-
-        # beende alle übriggebliebenen ros2 nodes (nciht nötig da durch PGID terminiert)
-        #subprocess.run(["pkill", "-9", "-f" "ros|rviz|spawner"])
-
         print("Alle Prozesse beendet!")
+        # beende alle übriggebliebenen ros2 nodes (nicht nötig da durch PGID terminiert)
+        #subprocess.run(["pkill", "-9", "-f" "ros|rviz|spawner"])

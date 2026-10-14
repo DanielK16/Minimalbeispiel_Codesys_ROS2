@@ -1,3 +1,8 @@
+# Autor: Daniel Körper 
+# Programmm basiert auf Beispielen von:
+# Programmen aus Arbeit: Navigation des TurtleBots mit LIDAR und 3D-Kamera von Nele Heinz
+# https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Service-And-Client.html
+
 import asyncio
 import logging
 
@@ -11,6 +16,11 @@ from asyncua import Client, ua
 # Logging etwas reduzieren
 logging.basicConfig(level=logging.WARNING)
 
+# für config file
+import yaml
+with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
+    config = yaml.safe_load(f)
+
 class OPC_UA_Client_Node(Node):
     def __init__(self):
         super().__init__('opc_ua_client_node')
@@ -20,7 +30,7 @@ class OPC_UA_Client_Node(Node):
 #####################################
         self.start_servo_client = self.create_client(
             Trigger,
-            '/servo_node/start_servo'
+            config['servo_node']['start_servo_service']
             )
         max_retries = 10
         retries = 0
@@ -32,11 +42,11 @@ class OPC_UA_Client_Node(Node):
                 return
 
 ####################################
-# Service Call zum Start des Services
+# Service Call zum Stop des Services Servo
 #####################################
         self.stop_servo_client = self.create_client(
             Trigger,
-            '/servo_node/stop_servo'
+            config['servo_node']['stop_servo_service']
             )
         max_retries = 10
         retries = 0
@@ -53,34 +63,35 @@ class OPC_UA_Client_Node(Node):
 #######################################
         self.delta_axis_publisher = self.create_publisher(
             JointJog,
-            '/servo_node/delta_joint_cmds',
+            config['servo_node']['delta_joint_cmd_topic'],
             10
         )
         
         # Mapping der myCobot Gelenke
         self.joint_names_list = [
-            "joint2_to_joint1",
-            "joint3_to_joint2",
-            "joint4_to_joint3",
-            "joint5_to_joint4",
-            "joint6_to_joint5",
-            "joint6output_to_joint6"
+            config['joint_states']['axis_0'],
+            config['joint_states']['axis_1'],
+            config['joint_states']['axis_2'],
+            config['joint_states']['axis_3'],
+            config['joint_states']['axis_4'],
+            config['joint_states']['axis_5']
         ]
 
-        # Hier speichern wir die aktuellen Geschwindigkeiten pro Gelenk
+        # aktuellen Geschwindigkeiten pro Gelenk
         self.calculated_joint_velocities = {j: 0.0 for j in self.joint_names_list}
 
         # Alle 0.05 sekunden publishen von MoveIt Servo
         self.tf_timer = self.create_timer(0.05, self.JointJogCallback)
 
     def update_jog_velocity(self, axis_index, direction, speed_value):
-        """Verrechnet Richtung (+1, -1, 0) und die globale Schieberegler-Geschwindigkeit"""
+        """Verrechnet Richtung (+1, -1, 0) und die Schieberegler-Geschwindigkeit"""
         if 0 <= axis_index < len(self.joint_names_list):
             joint_name = self.joint_names_list[axis_index]
             self.calculated_joint_velocities[joint_name] = float(direction * speed_value)
 
     def JointJogCallback(self):
-        """Sendet alle 0.05s die verrechneten Geschwindigkeiten an MoveIt Servo"""
+        """ Sendet alle 0.05s die verrechneten Geschwindigkeiten an MoveIt Servo """
+        """ Hier nicht über SubscriptionHandler da regelmäßig an MoveIt Servo gepublished werden muss da sonst auf Stop Status automatisch geht"""
         active_joints = []
         active_velocities = []
 
@@ -93,7 +104,7 @@ class OPC_UA_Client_Node(Node):
         msg.header.frame_id = "g_base"
         msg.header.stamp = self.get_clock().now().to_msg()
         
-        # Wenn nichts verfahren wird, 0.0 für Gelenk 1 senden (Hält den Servo-Stream aktiv)
+        # Wenn nichts verfahren wird, 0.0 für Gelenk 1 senden damit servo stream nicht abbricht!
         if not active_joints:
             msg.joint_names = [self.joint_names_list[0]]
             msg.velocities = [0.0]
@@ -105,12 +116,12 @@ class OPC_UA_Client_Node(Node):
 
 
 async def async_main(args=None):
-    ipaddress = "172.25.170.32"
-    port = "4840"
-    opc_url = f"opc.tcp://{ipaddress}:{port}"
-
     ros_node = OPC_UA_Client_Node()
 
+    # OPC UA Verbindungsaufbau
+    ipaddress = config['OPC_Client']['ipaddress']
+    port = config['OPC_Client']['port']
+    opc_url = f"opc.tcp://{ipaddress}:{port}"
     async with Client(url = opc_url,
                       timeout = 2.0,
                       watchdog_intervall = 0.5, 
@@ -119,25 +130,25 @@ async def async_main(args=None):
                       reconnect_request_timeout = 5.0) as client:
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
-        # --- OPC UA KNOTEN FÜR STEUERUNG ---
+        # Variablen aus Adressraum holen über Node IDs
         # erwartet 0 1 oder -1
         axis_direction_nodes = {
-            0: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_0"),
-            1: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_1"),
-            2: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_2"),
-            3: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_3"),
-            4: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_4"),
-            5: client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_5"),
+            "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_0"),
+            "axis_1": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_1"),
+            "axis_2": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_2"),
+            "axis_3": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_3"),
+            "axis_4": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_4"),
+            "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_5"),
         }
 
         # Velocity
-        global_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.velocity")
+        global_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Velocity")
 
-        # 3. Watchdog Node für CODESYS
+        #Watchdog Node für CODESYS
         watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.watchdog_counter")
         watchdog_counter = 0
 
-        # Enable Node
+        # Enable Node zum Start oder Stop des Servo Nodes
         enable_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.enable")
         current_enable_status = False
 
@@ -170,9 +181,9 @@ async def async_main(args=None):
                 # Globale Geschwindigkeit und Richtungen auslesen und verrechnen
                 try:
                     speed = await global_velocity_node.get_value()
-                    
+
                     for i in range(6):
-                        direction = await axis_direction_nodes[i].get_value()
+                        direction = await axis_direction_nodes[f"axis_{i}"].get_value()
                         ros_node.update_jog_velocity(i, int(direction), float(speed))
                 except Exception as e:
                     pass

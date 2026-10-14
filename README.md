@@ -59,8 +59,8 @@ Passe `--build-arg` an, ob ROS 2 **Humble** oder **Jazzy** benötigt wird:
 docker build -t <image_name> --build-arg ROS_DISTRO=humble .
 ```
 
-3. Image -> Container
-eventuell -v anpassen je nachdem wohin github gecloned wurde!  
+3. Image -> Container  
+eventuell -v (Volume) anpassen je nachdem wohin github gecloned wurde!    
 **auf Pfad achten -v!**  
 ```
 docker run -it \
@@ -73,7 +73,6 @@ docker run -it \
   -v ~/Minimalbeispiel_Codesys_ROS2/ros2_ws:/home/ros/ros2_ws \
   -w /home/ros/ros2_ws \
   <image_name> \
-  /bin/bash
 ```
 4. Container starten mit:
 ```
@@ -86,8 +85,7 @@ Die Einrichtung mit dem Deploy Tool ist weiter unten ausführlich erklärt
 
 5. ROS2 Projekt bauen
 ```
-sudo apt update
-sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 cd ~/ros2_ws
 rosdep init
 rosdep update

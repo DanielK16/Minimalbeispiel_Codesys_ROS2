@@ -1,5 +1,7 @@
-# Quellen
-# - https://docs.ros.org/en/rolling/ROS-Framework/nodes/Working-with-nodes/Writing-An-Async-Node-With-Asyncio-Python.html
+# Autor: Daniel Körper 
+# Programmm basiert auf Beispielen von:
+# Programmen aus Arbeit: Navigation des TurtleBots mit LIDAR und 3D-Kamera von Nele Heinz
+# https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html
 
 import asyncio
 import logging
@@ -12,8 +14,12 @@ from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 
 from asyncua import Client, ua
-
 logging.basicConfig(level=logging.WARNING)
+
+# für config file
+import yaml
+with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
+    config = yaml.safe_load(f)
 
 class OPC_UA_Client_Node(Node):
     def __init__(self):
@@ -34,7 +40,8 @@ class OPC_UA_Client_Node(Node):
             '/tcp_pose',
             self.tcp_pose_callback,
             10)
-        
+
+    # Verarbeitet von Subscriber erhaltene Daten    
     def joint_states_callback(self, msg):
         self.current_joint_states = msg
 
@@ -44,8 +51,8 @@ class OPC_UA_Client_Node(Node):
 
 async def async_main(args=None):
     # OPC UA Verbindung
-    ipaddress = "172.25.170.32"
-    port = "4840"
+    ipaddress = config['OPC_Client']['ipaddress']
+    port = config['OPC_Client']['port']
     opc_url = f"opc.tcp://{ipaddress}:{port}"
 
     ros_node = OPC_UA_Client_Node()
@@ -60,23 +67,23 @@ async def async_main(args=None):
 
         # Pos_Axis 
         axis_nodes = {
-            "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_0"),
-            "axis_1": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_1"),
-            "axis_2": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_2"),
-            "axis_3": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_3"),
-            "axis_4": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_4"),
-            "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_Axis.axis_5"),
+            "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_0"),
+            "axis_1": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_1"),
+            "axis_2": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_2"),
+            "axis_3": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_3"),
+            "axis_4": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_4"),
+            "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_5"),
         }
 
         # Pos_TCP
         tcp_nodes = {
-            "trans_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.trans_x"),
-            "trans_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.trans_y"),
-            "trans_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.trans_z"),
-            "rot_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_x"),
-            "rot_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_y"),
-            "rot_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_z"),
-            "rot_w": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Pos_TCP.rot_w")
+            "trans_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.trans_x"),
+            "trans_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.trans_y"),
+            "trans_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.trans_z"),
+            "rot_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.rot_x"),
+            "rot_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.rot_y"),
+            "rot_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.rot_z"),
+            "rot_w": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.rot_w")
         }
 
         # Watchdog Variable erhöhren
@@ -101,29 +108,29 @@ async def async_main(args=None):
                 if ros_node.current_joint_states is not None:
                     joint_state_msg = ros_node.current_joint_states
                     ros_node.current_joint_states = None  
-                    # joint states werden durcheinander gepublished, deswegen namenzuordnung!
-
+                    
+                # joint states werden in topic durcheinander gepublished, deswegen namenzuordnung!
                 try:
                     for i, joint_name in enumerate(joint_state_msg.name):
                         pos_val = joint_state_msg.position[i]
                         
-                        if joint_name == "joint2_to_joint1":
+                        if joint_name == config['joint_states']['axis_0']:
                             await axis_nodes["axis_0"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == "joint3_to_joint2":
+                        elif joint_name == config['joint_states']['axis_1']:
                             await axis_nodes["axis_1"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == "joint4_to_joint3":
+                        elif joint_name == config['joint_states']['axis_2']:
                             await axis_nodes["axis_2"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == "joint5_to_joint4":
+                        elif joint_name == config['joint_states']['axis_3']:
                             await axis_nodes["axis_3"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == "joint6_to_joint5":
+                        elif joint_name == config['joint_states']['axis_4']:
                             await axis_nodes["axis_4"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == "joint6output_to_joint6":
+                        elif joint_name == config['joint_states']['axis_5']:
                             await axis_nodes["axis_5"].set_value(float(pos_val), ua.VariantType.Double)
 
                 except Exception as e:
                     ros_node.get_logger().warn(f" Fehler beim Schreiben von /joint_states: {e}")
 
-                # ---- TCP POSE SCHREIBEN ----
+                # tcp pose
                 if ros_node.current_tcp_pose is not None:
                     p_msg = ros_node.current_tcp_pose
                     ros_node.current_tcp_pose = None  
@@ -139,7 +146,7 @@ async def async_main(args=None):
                     except Exception as e:
                         ros_node.get_logger().warn(f" Fehler beim Schreiben von /tcp_pose: {e}")
                 
-                # Kurze Pause für die CPU 
+                # Kurze Pause 
                 await asyncio.sleep(0.1)
                 
         except KeyboardInterrupt:
@@ -156,6 +163,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        # ROS2 sauber herunterfahren
         if rclpy.ok():
             rclpy.shutdown()
 

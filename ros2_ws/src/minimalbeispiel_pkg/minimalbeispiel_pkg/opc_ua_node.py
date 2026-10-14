@@ -1,6 +1,8 @@
+# Autor: Daniel Körper
+# OPC UA Client für Turtlesim Simulation
 import rclpy
 from rclpy.node import Node
-from turtlesim.msg import Pose
+from turtlesim.msg import Pose          
 from geometry_msgs.msg import Twist
 
 import asyncio
@@ -70,7 +72,7 @@ async def async_main(args=None):
                         ) as client:
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
         
-        # node holen
+        # Variablen aus Adressraum holen über NodeId
         opc_ziel_knoten = {
 
             "x_pose": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/c1Zp3vJSW28y9njK04S5nsM3Hp"),
@@ -84,7 +86,8 @@ async def async_main(args=None):
 
             "angular_z": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/c1Zp3vJSW24C1wtvUleMfiLnOc7yFmtvlA")
         }
-                            
+
+        # Subscription Handler einrichten                            
         handler = SubscriptionHandler(ros_node, opc_ziel_knoten)
         sub = await client.create_subscription(100,handler) #publishing interval in ms
         await sub.subscribe_data_change([opc_ziel_knoten["linear_x"], opc_ziel_knoten["angular_z"]])
