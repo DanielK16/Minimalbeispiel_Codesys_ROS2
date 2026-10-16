@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Projektarbeit_WS2627_Koerper" company="" webLink="http://" view-date="2026-08-31" view-index="0" gantt-divider-location="604" resource-divider-location="300" version="3.3.3316" locale="de_DE">
+<?xml version="1.0" encoding="UTF-8"?><project name="Projektarbeit_WS2627_Koerper" company="" webLink="http://" view-date="2026-09-28" view-index="0" gantt-divider-location="597" resource-divider-location="300" version="3.3.3316" locale="de_DE">
     <description><![CDATA[Projektarbeit an der TH Mannheim zum Thema ROS2 und Codesys]]></description>
-    <view zooming-state="default:7" id="gantt-chart">
-        <field id="tpd3" name="Vorgang" width="472" order="0"/>
-        <field id="tpd4" name="Anfang" width="10" order="1"/>
-        <field id="tpd5" name="Ende" width="106" order="2"/>
+    <view zooming-state="default:6" id="gantt-chart">
+        <field id="tpd3" name="Vorgang" width="458" order="0"/>
+        <field id="tpd4" name="Anfang" width="20" order="1"/>
+        <field id="tpd5" name="Ende" width="103" order="2"/>
         <field id="tpd15" name="Notizen" width="20" order="3"/>
         <option id="filter.completedTasks" value="false"/>
         <option id="filter.dueTodayTasks" value="false"/>
         <option id="filter.overdueTasks" value="false"/>
         <option id="filter.inProgressTodayTasks" value="false"/>
         <timeline><![CDATA[5]]></timeline>
-        <option id="color.recent"><![CDATA[#0000ff #ff0000 #00ff00 #ffff33 #66ffff]]></option>
+        <option id="color.recent"><![CDATA[#cc00cc #f4f4f4 #0000ff #ff0000 #00ff00 #ffff33 #66ffff]]></option>
     </view>
     <view id="resource-table">
         <field id="0" name="Ressource" width="210" order="0"/>
@@ -65,7 +65,7 @@ Designentscheidungen treffen]]></notes>
 z.B. Topic Counter]]></notes>
             </task>
         </task>
-        <task id="12" uid="fc615daba73b4a78bbb93f4976ee3e07" name="Phase 2: Simulation Roboterarm" color="#0000ff" meeting="false" start="2026-09-08" duration="39" complete="63" expand="true">
+        <task id="12" uid="fc615daba73b4a78bbb93f4976ee3e07" name="Phase 2: Simulation Roboterarm" color="#0000ff" meeting="false" start="2026-09-08" duration="41" complete="60" expand="true">
             <task id="3" uid="7570ef1ba966415985882c969c21397b" name="Simulation Roboterarm" color="#0000ff" meeting="false" start="2026-09-08" duration="18" complete="80" expand="true">
                 <notes><![CDATA[RVIZ, Gazebo, 
 eigene URDF bauen
@@ -98,30 +98,34 @@ Grundlagen OPC UA
 Beschreibung des Minimalbeispiels TurtleSim
 ]]></notes>
             </task>
-            <task id="23" uid="8186a5d5a5ac44259010cf00ffc987dd" name="Dokumentation Simulation (GitHub + Bericht)" color="#0000ff" meeting="false" start="2026-10-09" duration="8" complete="25" expand="true"/>
-            <task id="22" uid="dfbfdb63580f479a9735cd0bf261589b" name="Doku + GitHub für Simulation" color="#0000ff" meeting="true" start="2026-10-17" duration="0" complete="0" expand="true">
+            <task id="23" uid="8186a5d5a5ac44259010cf00ffc987dd" name="Dokumentation Simulation (GitHub + Bericht)" color="#0000ff" meeting="false" start="2026-10-09" duration="10" complete="25" expand="true"/>
+            <task id="22" uid="dfbfdb63580f479a9735cd0bf261589b" name="Doku + GitHub für Simulation" color="#0000ff" meeting="true" start="2026-10-18" duration="0" complete="0" expand="true">
                 <notes><![CDATA[Doku erstellen für Simulation 
 ]]></notes>
             </task>
-            <task id="25" uid="a10509b026554691a3400473328cde0d" name="SoftKeys in Codesys einfügen" color="#0000ff" meeting="true" start="2026-10-13" duration="0" complete="0" expand="true">
+            <task id="25" uid="a10509b026554691a3400473328cde0d" name="SoftKeys in Codesys einfügen" color="#0000ff" meeting="true" start="2026-10-13" duration="0" complete="100" expand="true">
                 <notes><![CDATA[Start von RVIz2 und der Clients aus Codesys aus
 python3 entrypoint.py muss davor gestartet werden!
 ]]></notes>
             </task>
-            <task id="24" uid="1d43bd57826c44baafa8224f3ebe64ab" name="neuen Roboter Testweise einbinden!" color="#0000ff" meeting="true" start="2026-10-13" duration="0" complete="0" expand="true">
+            <task id="24" uid="1d43bd57826c44baafa8224f3ebe64ab" name="neuen Roboter Testweise einbinden!" color="#0000ff" meeting="true" start="2026-10-13" duration="0" complete="100" expand="true">
                 <notes><![CDATA[neuen Roboter (6 achsig) testweise einbinden.
 Beschreiben was dafür alles geändert werden muss!
 z.B. mit xArm6]]></notes>
             </task>
         </task>
-        <task id="13" uid="aeaec0cb4a4d490b8e94d6e9af30c2cd" name="Phase 3: Turtlebot4 im Labor" color="#ffff33" meeting="false" start="2026-10-17" duration="26" complete="0" expand="true">
-            <task id="9" uid="581a4aaa14b44358ad470e27237e5d60" name="Einarbeitung Turtlebot4 im Labor" color="#ffff33" meeting="false" start="2026-10-17" duration="7" complete="0" expand="true">
+        <task id="13" uid="aeaec0cb4a4d490b8e94d6e9af30c2cd" name="Phase 3: Turtlebot4 im Labor" color="#ffff33" meeting="false" start="2026-10-19" duration="28" complete="0" expand="true">
+            <task id="9" uid="581a4aaa14b44358ad470e27237e5d60" name="Einarbeitung Turtlebot4 im Labor" color="#ffff33" meeting="false" start="2026-10-19" duration="5" complete="0" expand="true">
                 <notes><![CDATA[Minimalbeispiel zur Steuerung mithilfe von Nav2
 Minimalbeispile Kommunikation Codesys ROS2 Turtulebot
 ]]></notes>
                 <depend id="10" type="2" difference="0" hardness="Strong"/>
             </task>
-            <task id="10" uid="9b28c12de9bf469d8e5e2df90fbdbe5c" name="Turtlebot + Codesys Steuerung" color="#ffff33" meeting="false" start="2026-10-24" duration="19" complete="0" expand="true"/>
+            <task id="10" uid="9b28c12de9bf469d8e5e2df90fbdbe5c" name="Turtlebot + Codesys Steuerung" color="#ffff33" meeting="false" start="2026-10-24" duration="23" complete="0" expand="true"/>
+        </task>
+        <task id="27" uid="b37450f9bbad436592f59d2290a93df7" name="Phase 4: Abgabe der Arbeit" color="#cc00cc" meeting="false" start="2026-11-16" duration="11" complete="0" expand="true">
+            <task id="26" uid="9838a373163d4355b82c34938ee6e4e0" name="Schreiben + Korrekturlesen Arbeit" color="#cc00cc" meeting="false" start="2026-11-16" duration="11" complete="0" expand="true"/>
+            <task id="28" uid="816ab88def484d0abf0a2aa07342d06a" name="Abgabe Arbeit" color="#cc00cc" meeting="true" start="2026-11-26" duration="0" complete="0" expand="true"/>
         </task>
         <task id="6" uid="7b9fd185a82e43ca8064bb316872419c" name="Kanada" color="#66ffff" meeting="false" start="2026-09-25" duration="14" complete="100" expand="true">
             <depend id="23" type="2" difference="0" hardness="Strong"/>

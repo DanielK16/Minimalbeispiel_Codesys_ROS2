@@ -1,5 +1,6 @@
 # MoveIt Servo Konfiguration für myCobot 
 # übernommen von https://github.com/xArm-Developer/xarm_ros2/blob/humble/xarm_moveit_servo/config/xarm_moveit_servo_config.yaml und angepasst
+# offizielle Doku: https://github.com/moveit/moveit2/blob/main/moveit_ros/moveit_servo/config/servo_parameters.yaml
 
 # Gazebo Simulation
 use_gazebo: false 
@@ -12,18 +13,18 @@ scale:
   joint: 0.4         # Max. Gelenkgeschwindigkeit (rad/s)
 
 # Einheit von ausgehenden Signalen
-publish_period: 0.033  # Frequenz, mit der Servo Befehle sendet (ca. 30 Hz)
-low_latency_mode: true  # Publishe sobald eine neue Twist msg ankommt (publish_period wird ignoriert)
+publish_period: 0.02 # Frequenz, mit der Servo Befehle sendet in Sekunden
+low_latency_mode: false  # Publishe sobald eine neue Twist msg ankommt (publish_period wird ignoriert)
 low_pass_filter_coeff: 2.0  # Larger --> trust the filtered data more, trust the measurements less.
+incoming_command_timeout:  0.2  # Stop servoing if X seconds elapse without a new command, if 0 then no stop
 
-
-# --- ROBOTER & GRUPPEN ---
+# Roboter
 move_group_name: "arm_group"              
-planning_frame: "g_base"            # Das Welt-/Basis-Koordinatensystem
-robot_link_command_frame: "g_base"  # Bezugssystem für kartesische Befehle
-ee_frame_name: "joint6_flange"      # Dein Tool Center Point (TCP / Flansch)
+planning_frame: "g_base"            # Basis-Koordinatensystem (MCS)
+robot_link_command_frame: "g_base"  # Bezugssystem für Befehle
+ee_frame_name: "joint6_flange"      # Tool Center Point (TCP)
 
-# Exakte Liste deiner URDF-Gelenke
+# Joint Names
 joint_names:
   - joint2_to_joint1
   - joint3_to_joint2
@@ -40,8 +41,6 @@ command_out_topic: "/arm_group_controller/joint_trajectory"
 # Ausgangstyp
 command_out_type: "trajectory_msgs/JointTrajectory"
 
-
-
 # joint topic
 joint_topic: "/joint_states"
 joint_state_update_delay: 0.05 # Toleranz für verzögerte Joint States (in s)
@@ -52,15 +51,15 @@ publish_joint_velocities: false
 publish_joint_accelerations: false
 
 # Kollisionen
-check_collisions: true              # Echtzeit-Kollisionsprüfung aktivieren!
+check_collisions: true              # Echtzeit-Kollisionsprüfung 
 collision_check_rate: 10.0          # Prüfrate in Hz
 self_collision_proximity_threshold: 0.01 # Abstand in Metern, ab dem gewarnt wird
 scene_collision_proximity_threshold: 0.02
 
 # Singularitäten und Joint Limits
-# lower_singularity_threshold: 17.0  # Start decelerating when the condition number hits this (close to singularity)
-# hard_singularity_threshold: 30.0  # Stop when the condition number hits this
-singularity_threshold: 0.01
+lower_singularity_threshold: 1400.0               # Erst ab Konditionszahl 600 abbremsen
+hard_stop_singularity_threshold: 2900.0          # Not-Stopp erst bei extremen Singularitäten
+leaving_singularity_threshold_multiplier: 3.0    # Erleichtert das Herausfahren aus Singularitäten
 joint_limit_margin: 0.1 # [rad] Sicherheitsabstand zu den mechanischen Gelenk-Limits
 
 is_primary_planning_scene_monitor: true

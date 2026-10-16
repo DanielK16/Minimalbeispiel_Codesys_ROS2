@@ -33,7 +33,7 @@ def generate_launch_description():
             servo_params,
             moveit_config.robot_description,
             moveit_config.robot_description_semantic,
-            moveit_config.robot_description_kinematics,
+            #moveit_config.robot_description_kinematics,    #default Jacobian Solver nutzen -> mit bio_ik solver drift!
             moveit_config.joint_limits,
         ],
         output="screen",

@@ -2,6 +2,7 @@
 # Programmm basiert auf Beispielen von:
 # Programmen aus Arbeit: Navigation des TurtleBots mit LIDAR und 3D-Kamera von Nele Heinz
 # https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html
+# https://github.com/FreeOpcUa/opcua-asyncio/issues/1787
 
 import asyncio
 import logging
@@ -109,26 +110,30 @@ async def async_main(args=None):
                     joint_state_msg = ros_node.current_joint_states
                     ros_node.current_joint_states = None  
                     
-                # joint states werden in topic durcheinander gepublished, deswegen namenzuordnung!
-                try:
-                    for i, joint_name in enumerate(joint_state_msg.name):
-                        pos_val = joint_state_msg.position[i]
+                    # joint states werden in topic durcheinander gepublished, deswegen namenzuordnung!
+                    try:
+                        tasks = []
+                        for i, joint_name in enumerate(joint_state_msg.name):
+                            pos_val = joint_state_msg.position[i]
+                            
+                            if joint_name == config['joint_states']['axis_0']:
+                                tasks.append(axis_nodes["axis_0"].set_value(pos_val, ua.VariantType.Double))
+                            elif joint_name == config['joint_states']['axis_1']:
+                                tasks.append(axis_nodes["axis_1"].set_value(pos_val, ua.VariantType.Double))
+                            elif joint_name == config['joint_states']['axis_2']:
+                                tasks.append(axis_nodes["axis_2"].set_value(pos_val, ua.VariantType.Double))
+                            elif joint_name == config['joint_states']['axis_3']:
+                                tasks.append(axis_nodes["axis_3"].set_value(pos_val, ua.VariantType.Double))
+                            elif joint_name == config['joint_states']['axis_4']:
+                                tasks.append(axis_nodes["axis_4"].set_value(pos_val, ua.VariantType.Double))
+                            elif joint_name == config['joint_states']['axis_5']:
+                                tasks.append(axis_nodes["axis_5"].set_value(pos_val, ua.VariantType.Double))
                         
-                        if joint_name == config['joint_states']['axis_0']:
-                            await axis_nodes["axis_0"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == config['joint_states']['axis_1']:
-                            await axis_nodes["axis_1"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == config['joint_states']['axis_2']:
-                            await axis_nodes["axis_2"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == config['joint_states']['axis_3']:
-                            await axis_nodes["axis_3"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == config['joint_states']['axis_4']:
-                            await axis_nodes["axis_4"].set_value(float(pos_val), ua.VariantType.Double)
-                        elif joint_name == config['joint_states']['axis_5']:
-                            await axis_nodes["axis_5"].set_value(float(pos_val), ua.VariantType.Double)
-
-                except Exception as e:
-                    ros_node.get_logger().warn(f" Fehler beim Schreiben von /joint_states: {e}")
+                        if tasks:
+                            # führt alle Schreibbefehle für die Achsen parallel gleichzeitig aus
+                            await asyncio.gather(*tasks)
+                    except Exception as e:
+                        ros_node.get_logger().warn(f" Fehler beim Schreiben von /joint_states: {e}")
 
                 # tcp pose
                 if ros_node.current_tcp_pose is not None:
@@ -136,18 +141,20 @@ async def async_main(args=None):
                     ros_node.current_tcp_pose = None  
                     
                     try:
-                        await tcp_nodes['trans_x'].set_value(float(p_msg.position.x), ua.VariantType.Double)
-                        await tcp_nodes['trans_y'].set_value(float(p_msg.position.y), ua.VariantType.Double)
-                        await tcp_nodes['trans_z'].set_value(float(p_msg.position.z), ua.VariantType.Double)
-                        await tcp_nodes['rot_x'].set_value(float(p_msg.orientation.x), ua.VariantType.Double)
-                        await tcp_nodes['rot_y'].set_value(float(p_msg.orientation.y), ua.VariantType.Double)
-                        await tcp_nodes['rot_z'].set_value(float(p_msg.orientation.z), ua.VariantType.Double)
-                        await tcp_nodes['rot_w'].set_value(float(p_msg.orientation.w), ua.VariantType.Double)
+                        await asyncio.gather(
+                            tcp_nodes['trans_x'].set_value(float(p_msg.position.x), ua.VariantType.Double),
+                            tcp_nodes['trans_y'].set_value(float(p_msg.position.y), ua.VariantType.Double),
+                            tcp_nodes['trans_z'].set_value(float(p_msg.position.z), ua.VariantType.Double),
+                            tcp_nodes['rot_x'].set_value(float(p_msg.orientation.x), ua.VariantType.Double),
+                            tcp_nodes['rot_y'].set_value(float(p_msg.orientation.y), ua.VariantType.Double),
+                            tcp_nodes['rot_z'].set_value(float(p_msg.orientation.z), ua.VariantType.Double),
+                            tcp_nodes['rot_w'].set_value(float(p_msg.orientation.w), ua.VariantType.Double)
+                        )
                     except Exception as e:
                         ros_node.get_logger().warn(f" Fehler beim Schreiben von /tcp_pose: {e}")
                 
                 # Kurze Pause 
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.05)
                 
         except KeyboardInterrupt:
             pass

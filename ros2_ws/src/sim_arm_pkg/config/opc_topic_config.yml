@@ -3,7 +3,7 @@
 OPC_Client:
   ipaddress: "172.25.170.32"
   port: "4840"
-  username: ""  # optional / muss noch in code implementiert werden falls
+  username: ""  # optional / muss noch in code implementiert werden falls gewünscht
   password: ""  # optional
 
 ########## Joint State Names ########################
@@ -33,6 +33,9 @@ servo_node:
   start_servo_service: '/servo_node/start_servo'
   stop_servo_service: '/servo_node/stop_servo'
   delta_joint_cmd_topic: '/servo_node/delta_joint_cmds'
+  delta_tcp_cmd_topic: '/servo_node/delta_twist_cmds'
+  status_topic: '/servo_node/status'
+  servo_base: 'g_base'  
 
 # Servo Node für xArm6
 # servo_node:

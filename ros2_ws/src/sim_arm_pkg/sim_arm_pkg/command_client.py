@@ -9,14 +9,16 @@ import logging
 import rclpy
 from rclpy.node import Node
 from control_msgs.msg import JointJog
+from geometry_msgs.msg import TwistStamped
 from std_srvs.srv import Trigger
+from std_msgs.msg import Int8
 
 from asyncua import Client, ua
 
 # Logging etwas reduzieren
 logging.basicConfig(level=logging.WARNING)
 
-# für config file
+# Config laden
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
@@ -25,9 +27,8 @@ class OPC_UA_Client_Node(Node):
     def __init__(self):
         super().__init__('opc_ua_client_node')
 
-####################################
-# Service Call zum Start des Services
-#####################################
+        ### Servo Services ###
+        # Start Servo Service
         self.start_servo_client = self.create_client(
             Trigger,
             config['servo_node']['start_servo_service']
@@ -40,10 +41,8 @@ class OPC_UA_Client_Node(Node):
             if retries >= max_retries:
                 self.get_logger().error('Konnte keine Verbindung zum Servo-Service start_servo herstellen!')
                 return
-
-####################################
-# Service Call zum Stop des Services Servo
-#####################################
+            
+        # Stop Servo Service
         self.stop_servo_client = self.create_client(
             Trigger,
             config['servo_node']['stop_servo_service']
@@ -57,17 +56,47 @@ class OPC_UA_Client_Node(Node):
                 self.get_logger().error('Konnte keine Verbindung zum Servo-Service stop_servo herstellen!')
                 return
 
-
-#######################################
-# Publisher für MoveIt Servo JointJog
-#######################################
+        ## Publisher
+        # Servo Axis
         self.delta_axis_publisher = self.create_publisher(
             JointJog,
             config['servo_node']['delta_joint_cmd_topic'],
             10
         )
-        
-        # Mapping der myCobot Gelenke
+
+        # Servo TCP
+        self.delta_tcp_publisher = self.create_publisher(
+            TwistStamped,
+            config['servo_node']['delta_tcp_cmd_topic'],
+            10)
+
+        ## Subcsriber
+        # Subscribe zu status um Statuscodes zu Codesys zu übertragen
+        self.status_subscriber = self.create_subscription(
+            Int8,
+            config['servo_node']['status_topic'],
+            self.status_callback,
+            1)
+        self.status_subscriber  # prevent unused variable warning
+
+        ## Variablen Initialisieren
+        # Status 
+        self.servo_status = None
+        self.last_sent_status = None
+
+        # Mode 
+        self.current_mode = "NONE"  # TCP, AXIS oder NONE
+
+        # TCP
+        self.tcp_trans_x = 0
+        self.tcp_trans_y = 0
+        self.tcp_trans_z = 0
+        self.tcp_rot_x = 0
+        self.tcp_rot_y = 0
+        self.tcp_rot_z = 0
+        self.tcp_velocity = 0
+
+        # Axis
         self.joint_names_list = [
             config['joint_states']['axis_0'],
             config['joint_states']['axis_1'],
@@ -76,44 +105,91 @@ class OPC_UA_Client_Node(Node):
             config['joint_states']['axis_4'],
             config['joint_states']['axis_5']
         ]
-
-        # aktuellen Geschwindigkeiten pro Gelenk
         self.calculated_joint_velocities = {j: 0.0 for j in self.joint_names_list}
 
-        # Alle 0.05 sekunden publishen von MoveIt Servo
-        self.tf_timer = self.create_timer(0.05, self.JointJogCallback)
+        # Timer um alle 0.05 sek zu publishen
+        #self.publish_timer = self.create_timer(0.05, self.ServoCallback)
 
-    def update_jog_velocity(self, axis_index, direction, speed_value):
-        """Verrechnet Richtung (+1, -1, 0) und die Schieberegler-Geschwindigkeit"""
-        if 0 <= axis_index < len(self.joint_names_list):
-            joint_name = self.joint_names_list[axis_index]
-            self.calculated_joint_velocities[joint_name] = float(direction * speed_value)
+    def update_tcp_values(self,trans_x, trans_y,trans_z,rot_x, rot_y, rot_z, velocity):
+        self.current_mode = "TCP"
+        self.tcp_trans_x = trans_x
+        self.tcp_trans_y = trans_y
+        self.tcp_trans_z = trans_z
+        self.tcp_rot_x = rot_x
+        self.tcp_rot_y = rot_y
+        self.tcp_rot_z = rot_z
+        self.tcp_velocity = velocity
 
-    def JointJogCallback(self):
-        """ Sendet alle 0.05s die verrechneten Geschwindigkeiten an MoveIt Servo """
-        """ Hier nicht über SubscriptionHandler da regelmäßig an MoveIt Servo gepublished werden muss da sonst auf Stop Status automatisch geht"""
-        active_joints = []
-        active_velocities = []
+    def update_axis_values(self, directions_list, speed_value):
+        self.current_mode = "AXIS"
+        speed = float(speed_value)
+        for i, direction in enumerate(directions_list):
+            joint_name = self.joint_names_list[i]
+            self.calculated_joint_velocities[joint_name] = float(direction) * speed
 
-        for joint, vel in self.calculated_joint_velocities.items():
-            if vel != 0.0:
-                active_joints.append(joint)
-                active_velocities.append(vel)
+    def stop_all_motion(self):
+        """ Setzt alle Werte zurück und wechselt in Modus None """
+        self.current_mode = "NONE"
+        self.tcp_trans_x = 0.0
+        self.tcp_trans_y = 0.0
+        self.tcp_trans_z = 0.0
+        self.tcp_rot_x = 0.0
+        self.tcp_rot_y = 0.0
+        self.tcp_rot_z = 0.0
+        self.tcp_velocity = 0.0
+        for j in self.joint_names_list:
+            self.calculated_joint_velocities[j] = 0.0
 
-        msg = JointJog()
-        msg.header.frame_id = "g_base"
-        msg.header.stamp = self.get_clock().now().to_msg()
-        
-        # Wenn nichts verfahren wird, 0.0 für Gelenk 1 senden damit servo stream nicht abbricht!
-        if not active_joints:
+    def status_callback(self, msg):
+        self.servo_status = msg
+
+    def ServoCallback(self):
+        """ Wird alle 0.05s gepublished """
+        if self.current_mode == "TCP":
+            # TCP publishen
+            msg = TwistStamped()
+            msg.header.stamp = self.get_clock().now().to_msg()
+            msg.header.frame_id = config['servo_node']['servo_base']
+            msg.twist.linear.x = self.tcp_trans_x * self.tcp_velocity
+            msg.twist.linear.y = self.tcp_trans_y * self.tcp_velocity
+            msg.twist.linear.z = self.tcp_trans_z * self.tcp_velocity
+            msg.twist.angular.x = self.tcp_rot_x * self.tcp_velocity
+            msg.twist.angular.y = self.tcp_rot_y * self.tcp_velocity
+            msg.twist.angular.z = self.tcp_rot_z * self.tcp_velocity
+            self.delta_tcp_publisher.publish(msg)
+            
+        elif self.current_mode == "AXIS":
+            # Gelenke publishen
+            active_joints = []
+            active_velocities = []
+            for joint, vel in self.calculated_joint_velocities.items():
+                if vel != 0.0:
+                    active_joints.append(joint)
+                    active_velocities.append(vel)
+
+            msg = JointJog()
+            msg.header.frame_id = config['servo_node']['servo_base']
+            msg.header.stamp = self.get_clock().now().to_msg()
+            
+            # Wenn kein Button gedrückt publishe 0.0 um Servo am Leben zu halten
+            if not active_joints:
+                msg.joint_names = [self.joint_names_list[0]]
+                msg.velocities = [0.0]
+            else:
+                msg.joint_names = active_joints
+                msg.velocities = active_velocities
+                
+            self.delta_axis_publisher.publish(msg)
+            
+        else: # "NONE"
+            # Weder TCP noch AXIS: Stopp-Kommando senden, damit Servo Stream aktiv bleibt
+            msg = JointJog()
+            msg.header.frame_id = config['servo_node']['servo_base']
+            msg.header.stamp = self.get_clock().now().to_msg()
             msg.joint_names = [self.joint_names_list[0]]
             msg.velocities = [0.0]
-        else:
-            msg.joint_names = active_joints
-            msg.velocities = active_velocities
-
-        self.delta_axis_publisher.publish(msg)
-
+            self.delta_axis_publisher.publish(msg)
+        
 
 async def async_main(args=None):
     ros_node = OPC_UA_Client_Node()
@@ -141,8 +217,20 @@ async def async_main(args=None):
             "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_5"),
         }
 
-        # Velocity
+        # Velocity axis
         global_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Velocity")
+
+        tcp_direction_nodes = {
+            "trans_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.trans_x"),
+            "trans_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.trans_y"),
+            "trans_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.trans_z"),
+            "rot_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.rot_x"),
+            "rot_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.rot_y"),
+            "rot_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.rot_z"),
+        }
+
+        # Velocity tcp
+        tcp_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Velocity")
 
         #Watchdog Node für CODESYS
         watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.watchdog_counter")
@@ -151,6 +239,15 @@ async def async_main(args=None):
         # Enable Node zum Start oder Stop des Servo Nodes
         enable_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.enable")
         current_enable_status = False
+
+        # aktueller Modus: ob TCP Werte oder Joint Werte gepublished werden
+        mode_nodes = {
+            "mode_axis": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Mode_Axis"),
+            "mode_tcp": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Mode_TCP"),
+        }
+
+        # Status Node /servo_node/status
+        status_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Status_Code")
 
         try:
             while rclpy.ok():
@@ -171,6 +268,17 @@ async def async_main(args=None):
                     ros_node.get_logger().info('Servo Node Stop-Request gesendet.')
                     current_enable_status = False
 
+                # Schreiben des aktuellen Status
+                current_status_val = 99  # Standardwert: Servo aus
+                if current_enable_status and ros_node.servo_status is not None:
+                    current_status_val = int(ros_node.servo_status.data)
+                if current_status_val != ros_node.last_sent_status:
+                    try:
+                        await status_node.set_value(current_status_val, ua.VariantType.SByte)
+                        ros_node.last_sent_status = current_status_val
+                    except Exception as e:
+                        ros_node.get_logger().warn(f"Status Node Fehler: {e}")
+
                 # Watchdog hochzählen und senden
                 try:
                     watchdog_counter = (watchdog_counter + 1) % 32767
@@ -178,15 +286,39 @@ async def async_main(args=None):
                 except Exception as e:
                     ros_node.get_logger().warn(f" Watchdog Fehler: {e}")
 
-                # Globale Geschwindigkeit und Richtungen auslesen und verrechnen
-                try:
-                    speed = await global_velocity_node.get_value()
+                # TCP Jogging und Joint Jogging Werte einlesen
+                try: 
+                    # Mode auslesen
+                    tcp_mode = await mode_nodes["mode_tcp"].get_value()
+                    axis_mode = await mode_nodes["mode_axis"].get_value()
 
-                    for i in range(6):
-                        direction = await axis_direction_nodes[f"axis_{i}"].get_value()
-                        ros_node.update_jog_velocity(i, int(direction), float(speed))
+                    if tcp_mode:
+                        # Lese nur TCP Werte
+                        tcp_vel = await tcp_velocity_node.get_value()
+                        tx = await tcp_direction_nodes["trans_x"].get_value()
+                        ty = await tcp_direction_nodes["trans_y"].get_value()
+                        tz = await tcp_direction_nodes["trans_z"].get_value()
+                        rx = await tcp_direction_nodes["rot_x"].get_value()
+                        ry = await tcp_direction_nodes["rot_y"].get_value()
+                        rz = await tcp_direction_nodes["rot_z"].get_value()
+                        ros_node.update_tcp_values(tx, ty, tz,rx,ry,rz, tcp_vel)
+
+                    elif axis_mode:
+                        # Lese nur Joint Werte
+                        joint_vel = await global_velocity_node.get_value()
+                        directions = [await axis_direction_nodes[f"axis_{i}"].get_value() for i in range(6)]
+                        ros_node.update_axis_values(directions, joint_vel)
+
+                    else: 
+                        # Kein Modus aktiv
+                        ros_node.stop_all_motion()
+
                 except Exception as e:
-                    pass
+                    ros_node.get_logger().error(f"Fehler beim Jogging: {e}")
+                    ros_node.stop_all_motion()
+
+                # Aufruf des ServoCallbacks
+                ros_node.ServoCallback()
                 
                 # Kurze Pause
                 await asyncio.sleep(0.05)

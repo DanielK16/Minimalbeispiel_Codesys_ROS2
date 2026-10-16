@@ -1,6 +1,7 @@
 # Quellen:
 # -https://github.com/moveit/moveit_tutorials/blob/master/doc/pilz_industrial_motion_planner/pilz_industrial_motion_planner.rst#id3
 # https://deepwiki.com/moveit/moveit2
+# https://docs.ros.org/en/humble/Tutorials/Intermediate/Writing-an-Action-Server-Client/Py.html
 
 import rclpy
 from rclpy.action import ActionClient
@@ -28,10 +29,6 @@ class ROSNode(Node):
         self.error_code = 0
 
         self._action_client = ActionClient(self, MoveGroup, '/move_action')
-        self.create_action_client()
-
-
-    def create_action_client(self):
         self.get_logger().info('Warte auf Server...')
         self._action_client.wait_for_server()
         self.get_logger().info('Action Server gefunden')
@@ -451,6 +448,7 @@ class ROSNode(Node):
 
     def get_result_callback(self, future):
         result = future.result().result
+        # Error Code aus Result auslesen
         error_code = result.error_code.val
         self.error_code = error_code
 

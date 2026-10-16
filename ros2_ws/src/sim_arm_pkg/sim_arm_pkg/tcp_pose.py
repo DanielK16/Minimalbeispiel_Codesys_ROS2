@@ -42,8 +42,8 @@ class ROS_Node(Node):
         # transformation "nachschauen"
         try: 
             t = self.tf_buffer.lookup_transform(
-                self.parent_frame,
-                self.child_frame,
+                self.parent_frame,  # g_base
+                self.child_frame,   # joint6_flange
                 rclpy.time.Time()   #um aktuellsten Transform zu bekommen
                 )
         except TransformException as ex:
