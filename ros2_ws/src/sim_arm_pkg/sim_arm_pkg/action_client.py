@@ -1,3 +1,4 @@
+# Autor: Daniel Körper
 # Quellen:
 # -https://github.com/moveit/moveit_tutorials/blob/master/doc/pilz_industrial_motion_planner/pilz_industrial_motion_planner.rst#id3
 # https://deepwiki.com/moveit/moveit2
@@ -15,8 +16,9 @@ from geometry_msgs.msg import Pose
 import asyncio
 from asyncua import Client, ua
 import logging
+logging.basicConfig(level=logging.WARNING)
 
-# für config file
+# Konfigurationsdatei laden
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
@@ -25,9 +27,11 @@ class ROSNode(Node):
     def __init__(self):
         super().__init__('ros_node')
 
-        # Deklaration error code
+        # Variablen Initialisieren
+        # Error Code
         self.error_code = 0
 
+        # Verbindung zu Action Client
         self._action_client = ActionClient(self, MoveGroup, '/move_action')
         self.get_logger().info('Warte auf Server...')
         self._action_client.wait_for_server()
@@ -508,7 +512,7 @@ async def async_main(args=None):
             trans_z_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.Soll_Pos_TCP.trans_z")
             velocityscaling_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.max_velocity_scaling")
 
-            # # Watchdog Variable erhöhren
+            # # Watchdog Variable erhöhen
             watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotAction.watchdog_counter")
             watchdog_counter = 0
 

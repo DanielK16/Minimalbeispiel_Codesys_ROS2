@@ -3,22 +3,21 @@
 # Programmen aus Arbeit: Navigation des TurtleBots mit LIDAR und 3D-Kamera von Nele Heinz
 # https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Service-And-Client.html
 
-import asyncio
-import logging
-
 import rclpy
 from rclpy.node import Node
-from control_msgs.msg import JointJog
-from geometry_msgs.msg import TwistStamped
-from std_srvs.srv import Trigger
-from std_msgs.msg import Int8
+# ROS2 Message Interfaces
+from control_msgs.msg import JointJog       # Gelenkwerte
+from geometry_msgs.msg import TwistStamped  # TCP im karteisischen Raum
+from std_srvs.srv import Trigger    # Service /start /stop Servo
+from std_msgs.msg import Int8       # Status des Servos
 
+import asyncio
+import logging
 from asyncua import Client, ua
-
 # Logging etwas reduzieren
 logging.basicConfig(level=logging.WARNING)
 
-# Config laden
+# Konfigurationsdatei laden
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
@@ -71,7 +70,7 @@ class OPC_UA_Client_Node(Node):
             10)
 
         ## Subcsriber
-        # Subscribe zu status um Statuscodes zu Codesys zu übertragen
+        # Status Codes
         self.status_subscriber = self.create_subscription(
             Int8,
             config['servo_node']['status_topic'],
@@ -107,9 +106,6 @@ class OPC_UA_Client_Node(Node):
         ]
         self.calculated_joint_velocities = {j: 0.0 for j in self.joint_names_list}
 
-        # Timer um alle 0.05 sek zu publishen
-        #self.publish_timer = self.create_timer(0.05, self.ServoCallback)
-
     def update_tcp_values(self,trans_x, trans_y,trans_z,rot_x, rot_y, rot_z, velocity):
         self.current_mode = "TCP"
         self.tcp_trans_x = trans_x
@@ -144,7 +140,6 @@ class OPC_UA_Client_Node(Node):
         self.servo_status = msg
 
     def ServoCallback(self):
-        """ Wird alle 0.05s gepublished """
         if self.current_mode == "TCP":
             # TCP publishen
             msg = TwistStamped()
@@ -192,6 +187,7 @@ class OPC_UA_Client_Node(Node):
         
 
 async def async_main(args=None):
+    # Instanzziieren der ROS2 Node Klasse
     ros_node = OPC_UA_Client_Node()
 
     # OPC UA Verbindungsaufbau
@@ -206,8 +202,8 @@ async def async_main(args=None):
                       reconnect_request_timeout = 5.0) as client:
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
-        # Variablen aus Adressraum holen über Node IDs
-        # erwartet 0 1 oder -1
+        # Verbindung zu Knoten im OPC-UA Server herstellen
+        # Richtung der Achsen (erwartet 0, 1 oder -1)
         axis_direction_nodes = {
             "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_0"),
             "axis_1": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_1"),
@@ -217,9 +213,10 @@ async def async_main(args=None):
             "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Servo.axis_5"),
         }
 
-        # Velocity axis
+        # Geschwindigkeit der Achsen
         global_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_Axis_Velocity")
 
+        # Richtung im kartesischen Raum (erwartet 0, 1 oder 1-)
         tcp_direction_nodes = {
             "trans_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.trans_x"),
             "trans_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.trans_y"),
@@ -229,14 +226,14 @@ async def async_main(args=None):
             "rot_z": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Servo.rot_z"),
         }
 
-        # Velocity tcp
+        # Geschwindigkeit im kartesischen Raum
         tcp_velocity_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Soll_TCP_Velocity")
 
-        #Watchdog Node für CODESYS
+        #Watchdog Node 
         watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.watchdog_counter")
         watchdog_counter = 0
 
-        # Enable Node zum Start oder Stop des Servo Nodes
+        # Enable Node zum Start (true) oder Stop (false) des Servo Nodes
         enable_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.enable")
         current_enable_status = False
 
@@ -256,7 +253,6 @@ async def async_main(args=None):
 
                 # Starten und Stopen der servo node
                 enable = await enable_node.get_value()
-
                 if enable and not current_enable_status:
                     ros_node.req = Trigger.Request()
                     ros_node.future = ros_node.start_servo_client.call_async(ros_node.req)
@@ -288,7 +284,7 @@ async def async_main(args=None):
 
                 # TCP Jogging und Joint Jogging Werte einlesen
                 try: 
-                    # Mode auslesen
+                    # Modus auslesen
                     tcp_mode = await mode_nodes["mode_tcp"].get_value()
                     axis_mode = await mode_nodes["mode_axis"].get_value()
 
@@ -324,7 +320,7 @@ async def async_main(args=None):
                 await asyncio.sleep(0.05)
                 
         except KeyboardInterrupt:
-            pass
+            ros_node.get_logger().info("Strg + C gedrückt: Programm wird beendet...")
         finally:
             await client.disconnect()
             ros_node.destroy_node()

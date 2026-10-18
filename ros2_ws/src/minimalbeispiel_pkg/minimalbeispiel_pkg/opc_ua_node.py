@@ -1,5 +1,6 @@
 # Autor: Daniel Körper
 # OPC UA Client für Turtlesim Simulation
+
 import rclpy
 from rclpy.node import Node
 from turtlesim.msg import Pose          
@@ -55,7 +56,6 @@ class SubscriptionHandler:
             self.current_angular_z = float(val)
         
         
-
 async def async_main(args=None):
     ros_node = OPC_UA_Client_Node()
 
@@ -76,7 +76,7 @@ async def async_main(args=None):
         opc_ziel_knoten = {
 
             "x_pose": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/c1Zp3vJSW28y9njK04S5nsM3Hp"),
-            #"x_pose": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.turtle1_pose.x_pose), # funktioniert nicht!
+            #"x_pose": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.turtle1_pose.x_pose), 
 
             "y_pose": client.get_node("ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBxx/c1Zp3vJSW28y9njK05S5nsM3Hp"),
 

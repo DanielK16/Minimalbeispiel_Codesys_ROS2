@@ -3,21 +3,23 @@
 # Programmen aus Arbeit: Navigation des TurtleBots mit LIDAR und 3D-Kamera von Nele Heinz
 # https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html
 # https://github.com/FreeOpcUa/opcua-asyncio/issues/1787
+# https://docs.python.org/3/library/asyncio-task.html#asyncio.gather
 
-import asyncio
-import logging
-
+# Imports
 import rclpy
 from rclpy.node import Node
 
-# imports für ROS2 Messages
-from sensor_msgs.msg import JointState
-from geometry_msgs.msg import Pose
+# Imports für ROS2 Messages
+from sensor_msgs.msg import JointState  # /joint_states
+from geometry_msgs.msg import Pose      # /tcp_pose
 
+# Imports für Asyncua
+import asyncio
 from asyncua import Client, ua
-logging.basicConfig(level=logging.WARNING)
+import logging
+logging.basicConfig(level=logging.WARNING) # reduziert Fehlermeldungen von asyncua  
 
-# für config file
+# Laden der Konfigurations Datei
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
@@ -25,6 +27,8 @@ with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") 
 class OPC_UA_Client_Node(Node):
     def __init__(self):
         super().__init__('opc_ua_client_node')
+        
+        # Variablen festlegen
         self.current_joint_states = None
         self.current_tcp_pose = None
 
@@ -33,16 +37,16 @@ class OPC_UA_Client_Node(Node):
             JointState,
             '/joint_states',
             self.joint_states_callback,
-            10)
+            1)
 
         # Subscriber für /tcp_pose
         self.tcp_pose_sub = self.create_subscription(
             Pose,
             '/tcp_pose',
             self.tcp_pose_callback,
-            10)
+            1)
 
-    # Verarbeitet von Subscriber erhaltene Daten    
+    # Verarbeiten von Subscriber erhaltene Daten    
     def joint_states_callback(self, msg):
         self.current_joint_states = msg
 
@@ -51,12 +55,13 @@ class OPC_UA_Client_Node(Node):
 
 
 async def async_main(args=None):
+    # Instanzziieren der ROS2 Node Klasse
+    ros_node = OPC_UA_Client_Node()
+    
     # OPC UA Verbindung
     ipaddress = config['OPC_Client']['ipaddress']
     port = config['OPC_Client']['port']
     opc_url = f"opc.tcp://{ipaddress}:{port}"
-
-    ros_node = OPC_UA_Client_Node()
 
     async with Client(url = opc_url,
                       timeout = 2.0,
@@ -66,7 +71,8 @@ async def async_main(args=None):
                       reconnect_request_timeout = 5.0, ) as client:
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
-        # Pos_Axis 
+        # Verbindung zu Knoten im OPC-UA Server herstellen
+        # Position der Achsen 
         axis_nodes = {
             "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_0"),
             "axis_1": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_1"),
@@ -76,7 +82,7 @@ async def async_main(args=None):
             "axis_5": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_5"),
         }
 
-        # Pos_TCP
+        # Position des TCP 
         tcp_nodes = {
             "trans_x": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.trans_x"),
             "trans_y": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.trans_y"),
@@ -87,7 +93,7 @@ async def async_main(args=None):
             "rot_w": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_TCP.rot_w")
         }
 
-        # Watchdog Variable erhöhren
+        # Watchdog Variable für Verbindungscheck
         watchdog_node = client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.watchdog_counter")
         watchdog_counter = 0
 
@@ -95,24 +101,24 @@ async def async_main(args=None):
             # Hauptschleife
             while rclpy.ok():
                 
-                # ROS Callbacks verarbeiten
+                # ROS2 Callbacks verarbeiten -> ließt neue msg für Subscriber ein
                 rclpy.spin_once(ros_node, timeout_sec=0.0)
                 
-                # Watchdog schreiben
+                # Watchdog Variable aktualisieren und schreiben
                 try:
                     watchdog_counter = (watchdog_counter + 1) % 32767  # Zählt von 0 bis 32766 hoch
                     await watchdog_node.set_value(int(watchdog_counter), ua.VariantType.Int16)
                 except Exception as e:
                     ros_node.get_logger().warn(f" Watchdog konnte nicht gesendet werden: {e}")
 
-                # Joint States schreiben
+                # aktuelle Joint States via OPC UA schreiben
                 if ros_node.current_joint_states is not None:
                     joint_state_msg = ros_node.current_joint_states
                     ros_node.current_joint_states = None  
                     
-                    # joint states werden in topic durcheinander gepublished, deswegen namenzuordnung!
+                    # joint states werden im topic durcheinander gepublished, deswegen namenzuordnung!
                     try:
-                        tasks = []
+                        tasks = []  
                         for i, joint_name in enumerate(joint_state_msg.name):
                             pos_val = joint_state_msg.position[i]
                             
@@ -130,12 +136,12 @@ async def async_main(args=None):
                                 tasks.append(axis_nodes["axis_5"].set_value(pos_val, ua.VariantType.Double))
                         
                         if tasks:
-                            # führt alle Schreibbefehle für die Achsen parallel gleichzeitig aus
+                            # führt alle Schreibbefehle für die Achsen parallel gleichzeitig 
                             await asyncio.gather(*tasks)
                     except Exception as e:
                         ros_node.get_logger().warn(f" Fehler beim Schreiben von /joint_states: {e}")
 
-                # tcp pose
+                # Aktuelle TCP Pose via OPC UA schreiben
                 if ros_node.current_tcp_pose is not None:
                     p_msg = ros_node.current_tcp_pose
                     ros_node.current_tcp_pose = None  
@@ -157,9 +163,9 @@ async def async_main(args=None):
                 await asyncio.sleep(0.05)
                 
         except KeyboardInterrupt:
-            pass
+            ros_node.get_logger().info("Strg + C gedrückt: Programm wird beendet...")
         finally:
-            await client.disconnect()
+            await client.disconnect()   
             ros_node.destroy_node()
 
 
