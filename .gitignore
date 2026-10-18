@@ -15,6 +15,7 @@ codesys/*.bootinfo
 codesys/*.bootinfo_guids
 codesys/*.compileinfo
 codesys/*.xml
+codesys/*.~u~
 
 # alte Codesys projekte
 codesys/Simulation_V2_OOP.project
