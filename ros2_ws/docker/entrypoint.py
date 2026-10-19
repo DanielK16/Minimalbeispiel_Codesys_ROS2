@@ -12,6 +12,10 @@ import signal
 import asyncio
 from asyncua import Client
 
+import yaml
+with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
+    config = yaml.safe_load(f)
+
 # Globale Variablen
 # Verhindern, dass nicht doppelt gestartet wird!
 RViz2_is_running = False
@@ -122,7 +126,7 @@ async def async_main():
     while True:
         try:
             # OPC UA Verbindung
-            ipaddress = "172.25.170.32"
+            ipaddress = config['OPC_Client']['ipaddress']
             port = "4840"
             opc_url = f"opc.tcp://{ipaddress}:{port}"
 
