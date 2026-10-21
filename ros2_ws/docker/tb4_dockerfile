@@ -1,0 +1,79 @@
+# Dockerfile um den Turtlebot4 in einer Gazebo und RViz2 Simulation zu starten
+
+########################################
+# Basis Image für ros2 humble mit desktop anwendungen (rviz2, gazebo, rqt)
+########################################
+ARG ROS_DISTRO=humble
+FROM osrf/ros:${ROS_DISTRO}-desktop
+
+ARG ROS_DISTRO
+
+########################################
+# Environment Variablen anlegen
+########################################
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# DDS Wechsel zu CycloneDDS (Löst das _NODE_NAME_UNKNOWN_ Problem in WSL2/Docker)
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV XDG_RUNTIME_DIR=/tmp/runtime-ros
+########################################
+# Systeminstallation & Abhängigkeiten (als root)
+########################################
+# 1. System Abhängigkeiten und CycloneDDS installieren
+# (Befehle sauber mit '&&' verkettet und ohne sudo)
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    sudo \
+    wget \
+    python3-pip \
+    software-properties-common \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Python OPC UA Packages installieren
+RUN pip3 install asyncua --ignore-installed cryptography
+
+# 3. Install TB4 Simulator und Dev Tools
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-turtlebot4-simulator \
+    ros-${ROS_DISTRO}-irobot-create-nodes \
+    ros-dev-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# 4. Install Gazebo (Ignition Fortress)
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' \
+    && wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add - \
+    && apt-get update && apt-get install -y \
+    ignition-fortress \
+    && rm -rf /var/lib/apt/lists/*
+
+########################################
+# Anlegen eines non root users
+########################################
+# Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
+RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
+
+ARG USERNAME=ros
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && mkdir -p /home/$USERNAME/.config \
+    && chown -R $USER_UID:$USER_GID /home/$USERNAME/.config
+
+# sudo rechte erteilen
+RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && usermod -aG video,dialout $USERNAME
+
+# ROS 2 Umgebung automatisch laden
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc
+
+########################################
+# Standard-User setzen (muss ganz am Ende passieren)
+########################################
+USER $USERNAME
+WORKDIR /home/$USERNAME
+
+CMD ["bash"]
