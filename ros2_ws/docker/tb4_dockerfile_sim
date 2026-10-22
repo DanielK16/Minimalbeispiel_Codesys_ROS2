@@ -1,16 +1,18 @@
-# Dockerfile um den Turtlebot4 in einer Gazebo und RViz2 Simulation zu starten
+# Autor: Daniel Körper
+# Dockerfile um die Turtlebot4 Simulation in einem Container laufen zu lassen
+# Mit ROS2 Jazzy läuft Simulation stabiler als mit humble! 
+# Realer Turtlebot läuft mir ros2 humble
+# Quellen:
+# - https://github.com/joshnewans/dockerfile_example/blob/main/Dockerfile
+# - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile#L31C26-L32C1
 
-########################################
 # Basis Image für ros2 humble mit desktop anwendungen (rviz2, gazebo, rqt)
-########################################
 ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop
 
 ARG ROS_DISTRO
 
-########################################
 # Environment Variablen anlegen
-########################################
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ENV DEBIAN_FRONTEND=noninteractive
 
