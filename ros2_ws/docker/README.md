@@ -1,10 +1,11 @@
-# My Cobot 280 Simulation
-## myCobot Image
+# Übersicht um Docker Container und Images zu bauen/starten
+## My Cobot 280 Simulation
+### myCobot Image
 ```
 docker build -t mycobot_sim_img --build-arg ROS_DISTRO=humble .
 ```
 
-## myCobot Container
+### myCobot Container
 ```
 docker run -it \
   --name mycobot_sim \
@@ -18,12 +19,12 @@ docker run -it \
   my_cobot_sim_img:latest \
 ```
 
-# TB4 Real
-## TB4 Real Image
+## TB4 Real
+### TB4 Real Image
 ```
 docker build -t tb4_real_img --build-arg ROS_DISTRO=humble -f tb4_dockerfile_real .
 ```
-## TB4 Real Container
+### TB4 Real Container
 ```
 docker run -it \
     --name tb4_real \
@@ -37,21 +38,21 @@ docker run -it \
     tb4_real_img:latest
 ```
 
-## Zenoh Container
+### Zenoh Container
 ```
 docker run -d \
-    --name zenoh_client
-    --network=host
-    eclipse/zenoh:latest
+    --name zenoh_client \
+    --network=host \
+    eclipse/zenoh:latest \
     --listener tcp/192.168.2.189:7447
 ```
 
-# TB4 Simulation
-## TB4 Simulation Image
+## TB4 Simulation
+### TB4 Simulation Image
 ```
-docker build -t tb4_sim_img --build-arg ROS_DISTRO=humble -f tb4_dockerfile_sim .
+docker build -t tb4_sim_img --build-arg ROS_DISTRO=jazzy -f tb4_dockerfile_sim .
 ```
-## TB4 Simulation Container
+### TB4 Simulation Container
 ```
 docker run -it \
     --name tb4_sim \

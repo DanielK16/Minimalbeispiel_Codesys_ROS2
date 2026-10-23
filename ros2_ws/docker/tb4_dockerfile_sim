@@ -1,58 +1,50 @@
 # Autor: Daniel Körper
 # Dockerfile um die Turtlebot4 Simulation in einem Container laufen zu lassen
 # Mit ROS2 Jazzy läuft Simulation stabiler als mit humble! 
-# Realer Turtlebot läuft mir ros2 humble
+# Realer Turtlebot läuft mit ros2 humble
 # Quellen:
-# - https://github.com/joshnewans/dockerfile_example/blob/main/Dockerfile
-# - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile#L31C26-L32C1
+# - https://github.com/kscottz/turtlebot4_docker/blob/2026/Dockerfile
 
-# Basis Image für ros2 humble mit desktop anwendungen (rviz2, gazebo, rqt)
-ARG ROS_DISTRO=humble
+# Basis Image für ros2 jazzy mit desktop anwendungen (rviz2, gazebo, rqt)
+ARG ROS_DISTRO=jazzy
 FROM osrf/ros:${ROS_DISTRO}-desktop
-
 ARG ROS_DISTRO
+ARG GZ_VERSION=harmonic
 
 # Environment Variablen anlegen
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ENV DEBIAN_FRONTEND=noninteractive
+ENV GZ_VERSION=${GZ_VERSION}
 
-# DDS Wechsel zu CycloneDDS (Löst das _NODE_NAME_UNKNOWN_ Problem in WSL2/Docker)
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ENV XDG_RUNTIME_DIR=/tmp/runtime-ros
-########################################
 # Systeminstallation & Abhängigkeiten (als root)
-########################################
-# 1. System Abhängigkeiten und CycloneDDS installieren
-# (Befehle sauber mit '&&' verkettet und ohne sudo)
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     sudo \
     wget \
+    gnupg \
     python3-pip \
     software-properties-common \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Python OPC UA Packages installieren
+# Python OPC UA Packages installieren
 RUN pip3 install asyncua --ignore-installed cryptography
 
-# 3. Install TB4 Simulator und Dev Tools
-RUN apt-get update && apt-get install -y \
-    ros-${ROS_DISTRO}-turtlebot4-simulator \
-    ros-${ROS_DISTRO}-irobot-create-nodes \
-    ros-dev-tools \
+# Install Gazebo Harmonic
+RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y "gz-${GZ_VERSION}" \
     && rm -rf /var/lib/apt/lists/*
 
-# 4. Install Gazebo (Ignition Fortress)
-RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' \
-    && wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add - \
-    && apt-get update && apt-get install -y \
-    ignition-fortress \
+# Install TB4 Simulator, ROS-Gz Bridge und Dev Tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    emacs \
+    htop \
+    byobu \
+    python3-pip \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
-########################################
-# Anlegen eines non root users
-########################################
-# Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
+# Anlegen eines non-root users
 RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
 
 ARG USERNAME=ros
@@ -64,18 +56,34 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && mkdir -p /home/$USERNAME/.config \
     && chown -R $USER_UID:$USER_GID /home/$USERNAME/.config
 
-# sudo rechte erteilen
+# Sudo-Rechte erteilen
 RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && usermod -aG video,dialout $USERNAME
 
-# ROS 2 Umgebung automatisch laden
+# ROS 2 Umgebung automatisch in bashrc laden
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc
 
-########################################
-# Standard-User setzen (muss ganz am Ende passieren)
-########################################
+# Workspace vorbereiten und Quellcode clonen (als root, danach Rechte an ros übergeben)
+RUN mkdir -p /home/$USERNAME/ros2_ws/src
+WORKDIR /home/$USERNAME/ros2_ws/src
+RUN git clone https://github.com/turtlebot/turtlebot4_simulator -b ${ROS_DISTRO}
+
+WORKDIR /home/$USERNAME/ros2_ws/
+RUN chown -R $USER_UID:$USER_GID /home/$USERNAME/ros2_ws
+
+# Standard-User setzen für den finalen Build / Runtime
 USER $USERNAME
-WORKDIR /home/$USERNAME
+WORKDIR /home/$USERNAME/ros2_ws
+
+# Rosdep initialisieren und Abhängigkeiten für den Simulator installieren
+RUN rosdep update && \
+    sudo apt-get update && \
+    . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    rosdep install --rosdistro ${ROS_DISTRO} -y --from-paths src --ignore-src
+
+# Workspace kompilieren
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    colcon build --symlink-install
 
 CMD ["bash"]
