@@ -41,10 +41,11 @@ docker run -it \
 ### Zenoh Container
 ```
 docker run -d \
-    --name zenoh_client \
-    --network=host \
-    eclipse/zenoh:latest \
-    --listener tcp/192.168.2.189:7447
+  --name zenoh_client \
+  --init \
+  --net host \
+  -e ROS_DISTRO=humble \
+  client -e tcp/192.168.2.198:7447
 ```
 
 ## TB4 Simulation
