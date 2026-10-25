@@ -11,6 +11,7 @@ from geometry_msgs.msg import TwistStamped  # TCP im karteisischen Raum
 from std_srvs.srv import Trigger    # Service /start /stop Servo
 from std_msgs.msg import Int8       # Status des Servos
 
+import os
 import asyncio
 import logging
 from asyncua import Client, ua
@@ -21,6 +22,7 @@ logging.basicConfig(level=logging.WARNING)
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
+config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class OPC_UA_Client_Node(Node):
     def __init__(self):

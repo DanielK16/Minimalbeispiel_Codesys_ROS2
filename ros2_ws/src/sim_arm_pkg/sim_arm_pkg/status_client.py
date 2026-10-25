@@ -14,6 +14,7 @@ from sensor_msgs.msg import JointState  # /joint_states
 from geometry_msgs.msg import Pose      # /tcp_pose
 
 # Imports für Asyncua
+import os
 import asyncio
 from asyncua import Client, ua
 import logging
@@ -23,6 +24,7 @@ logging.basicConfig(level=logging.WARNING) # reduziert Fehlermeldungen von async
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
+config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class OPC_UA_Client_Node(Node):
     def __init__(self):

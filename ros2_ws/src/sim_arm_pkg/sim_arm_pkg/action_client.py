@@ -13,6 +13,7 @@ from moveit_msgs.msg import Constraints, JointConstraint, PositionConstraint, Or
 from shape_msgs.msg import SolidPrimitive
 from geometry_msgs.msg import Pose
 
+import os
 import asyncio
 from asyncua import Client, ua
 import logging

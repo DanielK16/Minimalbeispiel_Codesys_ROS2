@@ -15,6 +15,7 @@ from asyncua import Client
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
+config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 # Globale Variablen
 # Verhindern, dass nicht doppelt gestartet wird!
