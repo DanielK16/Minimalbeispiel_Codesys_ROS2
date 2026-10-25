@@ -1,3 +1,4 @@
+# Autor: Daniel Körper
 # Dockerfile für xarm6
 # Vereinfacht Test und Installation
 
@@ -6,17 +7,15 @@ ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop
 ARG ROS_DISTRO
 
-########################################
-# Environment Variablen anlegen
-########################################
+##### Environment Variablen anlegen #####
 # verhindert Fehlermeldungen bei pip installs
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 # verhindert abfragen beim image bau -> Standard Werte werden verwendet
 ENV DEBIAN_FRONTEND=noninteractive
 
-########################################
-# Anlegen eines non root users
-########################################
+
+##### Anlegen eines non root users #####
+
 #  Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
 RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
 
@@ -41,10 +40,7 @@ USER ros
 # deswegen --user ros bei docker run
 USER root
 
-########################################
-# Systeminstallation als root
-########################################
-
+###### Systeminstallation als root #####
 # System Abhängigkeiten Installieren 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     sudo \
@@ -62,10 +58,8 @@ RUN apt-get update && apt-get upgrade -y && \
     ros-${ROS_DISTRO}-moveit-py \
     && rm -rf /var/lib/apt/lists/*
     
-# Standardmäßiger Start des Containers
+###### Standardmäßiger Start des Containers ######
 USER ros
-
-
 
 # Shell auf bash umstellen
 SHELL ["/bin/bash", "-c"]
