@@ -8,6 +8,7 @@
 # Imports
 import rclpy
 from rclpy.node import Node
+import os
 
 # Imports für ROS2 Messages
 from sensor_msgs.msg import JointState  # /joint_states
@@ -23,6 +24,8 @@ logging.basicConfig(level=logging.WARNING) # reduziert Fehlermeldungen von async
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
+    # Environment Variable von docker run übergebn
+config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class OPC_UA_Client_Node(Node):
     def __init__(self):
