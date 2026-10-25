@@ -16,6 +16,9 @@ class OPC_UA_Client_Node(Node):
         super().__init__('opc_ua_client_node')
         self.latest_pose = None  
 
+        # IP Adresse Parameter deklarieren -> kann dynamisch im ros2 run Befehl übergeben werden
+        self.declare_parameter('IP_Adresse', '172.25.170.32')
+
         # Publisher
         self.cmd_vel_publisher = self.create_publisher(
             Twist,
@@ -30,11 +33,11 @@ class OPC_UA_Client_Node(Node):
             self.pose_callback,
             10)
 
-    # topic werte der msg in variable zwischenspeichern
+    # Topic werte der .msg in Variable zwischenspeichern
     def pose_callback(self, msg):
         self.latest_pose = msg
 
-    # twist message zusammenbauen
+    # Twist msg zusammenbauen
     def publish_twist(self, linear_x, angular_z):
         twist_msg = Twist()
         twist_msg.linear.x = float(linear_x)
@@ -57,12 +60,14 @@ class SubscriptionHandler:
         
         
 async def async_main(args=None):
+    # ROS2 Node Initialisieren
     ros_node = OPC_UA_Client_Node()
 
     # OPC UA Verbindungsaufbau
-    ipaddress = "172.25.170.32"
+    ipaddress = ros_node.get_parameter('IP_Adresse').value
     port = "4840"
     opc_url = f"opc.tcp://{ipaddress}:{port}"
+    ros_node.get_logger().info(f"Versuche OPC Verbindung mit {opc_url} herzustellen")
     async with Client(url = opc_url,                    # Netzwerkadresse des Servers
                       timeout = 2.0,                    # Maximaler Zeitraum die Client auf Server Antwort wartet
                       watchdog_intervall = 0.5,         # alle 500ms checken ob Verbindung noch lebt

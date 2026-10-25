@@ -82,9 +82,6 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 # ros user wird über docker run engestellt mit --user ros
 USER root
 
-# WORKDIR /home/ros/ros2_ws
-# ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash && source install/setup.bash && python3 docker/entrypoint.py"]
-
 # Standard-Befehl beim Start des Containers welches programm er öffnen soll!
 CMD ["python3", "-u", "/home/ros/ros2_ws/docker/entrypoint.py"]
 

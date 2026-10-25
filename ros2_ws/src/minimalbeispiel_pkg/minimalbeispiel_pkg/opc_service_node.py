@@ -13,6 +13,10 @@ from asyncua import Client, ua
 class OPC_Service_Node(Node):
     def __init__(self):
         super().__init__("opc_service_node")
+
+        # IP Adresse Parameter deklarieren -> kann dynamisch im ros2 run Befehl übergeben werden
+        self.declare_parameter('IP_Adresse', '172.25.170.32')
+
         # Service Client erstellen
         self.service_client = self.create_client(Spawn,'spawn')
         while not self.service_client.wait_for_service(timeout_sec=1.0):
@@ -56,7 +60,7 @@ async def async_main(args=None):
     ros_node = OPC_Service_Node()
 
     # OPC UA Verbindungsaufbau
-    ipaddress = "172.25.170.32"
+    ipaddress = ros_node.get_parameter('IP_Adresse').value
     port = "4840"
     opc_url = f"opc.tcp://{ipaddress}:{port}"
 

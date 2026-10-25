@@ -19,6 +19,25 @@ docker run -it \
   my_cobot_sim_img:latest \
 ```
 
+# xArm6 
+## xArm6 Image
+```
+docker build -t xarm6_img --build-arg ROS_DISTRO=humble .
+```
+
+## xArm6 Container
+```
+docker run -it \
+  --name xarm6_e \
+  --user ros \
+  --hostname ros_container \
+  --network=host \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -w /home/ros/ros2_ws \
+  xarm6_img:latest
+```
+
 ## TB4 Real
 ### TB4 Real Image
 ```

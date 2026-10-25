@@ -1,0 +1,106 @@
+# Dockerfile für xarm6
+# Vereinfacht Test und Installation
+
+# Dockerfile für ROS2 Jazzy und OPC UA Connection Minimalbeispiel
+# Quellen:  YT Video: articulated robotics_ Crafting your dockerfile
+# - https://docs.docker.com/reference/dockerfile/
+# - https://docs.docker.com/engine/containers/run/
+# - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile
+
+# Basis Image für ros2 $ROS_DISTRO mit Desktop Anwendungen (RViz2, Gazebo ,rqt)
+ARG ROS_DISTRO=humble
+FROM osrf/ros:${ROS_DISTRO}-desktop
+ARG ROS_DISTRO
+
+########################################
+# Environment Variablen anlegen
+########################################
+# verhindert Fehlermeldungen bei pip installs
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+# verhindert abfragen beim image bau -> Standard Werte werden verwendet
+ENV DEBIAN_FRONTEND=noninteractive
+
+########################################
+# Anlegen eines non root users
+########################################
+#  Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
+RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
+
+# ARG ohne Leerzeichen ausführen
+ARG USERNAME=ros  
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME\
+    && mkdir /home/$USERNAME/.config && chown $USER_UID:$USER_GID /home/$USERNAME/.config
+
+# sudo rechte erteilen
+RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Alle Instruktionen danach werden als USER ros ausgeführt
+USER ros
+
+# Systemweite Packages müssen mit root erstellt werden
+# der letzte erwähnte user wird wird als standarmäig gesetzt wenn container startet
+# deswegen --user ros bei docker run
+USER root
+
+########################################
+# Systeminstallation als root
+########################################
+
+# System Abhängigkeiten Installieren 
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    sudo \
+    python3-pip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python Packages installieren
+# --break-system-pacakges erforderlich da sonst error
+RUN pip3 install asyncua --ignore-installed cryptography
+
+# ROS2 packages installieren
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y ros-${ROS_DISTRO}-pick-ik \
+    ros-${ROS_DISTRO}-moveit-py \
+    && rm -rf /var/lib/apt/lists/*
+    
+# Standardmäßiger Start des Containers
+USER ros
+
+
+
+# Shell auf bash umstellen
+SHELL ["/bin/bash", "-c"]
+
+# Installation von xarm6 
+WORKDIR /home/ros/ros2_ws/src
+RUN git clone https://github.com/xArm-Developer/xarm_ros2.git --recursive -b $ROS_DISTRO
+
+# sim arm pkg hinzufügen
+WORKDIR /home/ros/temp_git
+RUN git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git && \
+cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/src/sim_arm_pkg  /home/ros/ros2_ws/src && \
+cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/src/minimalbeispiel_pkg  /home/ros/ros2_ws/src && \
+cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/docker /home/ros/ros2_ws && \
+rm -rf /home/ros/temp_git
+
+# ROS2 Workspace bauen
+WORKDIR /home/ros/ros2_ws 
+RUN source /opt/ros/humble/setup.bash && \
+    sudo apt-get update && \
+    rosdep update && \
+    rosdep install --from-paths src -y --ignore-src --rosdistro $ROS_DISTRO 
+RUN source /opt/ros/humble/setup.bash &&\
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release 
+
+# ROS2 source direkt in .bashrc schreiben damit automatisch gesourced wenn neues Terminal geöffnet
+RUN echo "source /opt/${USERNAME}/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "source /home/${USERNAME}/ros2_ws/install/setup.bash" >> ~/.bashrc
+
+# Standard-Befehl beim Start des Containers welches programm er öffnen soll!
+CMD ["python3", "-u", "/home/ros/ros2_ws/docker/entrypoint.py"]
+
