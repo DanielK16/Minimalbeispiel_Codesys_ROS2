@@ -1,12 +1,6 @@
 # Dockerfile für xarm6
 # Vereinfacht Test und Installation
 
-# Dockerfile für ROS2 Jazzy und OPC UA Connection Minimalbeispiel
-# Quellen:  YT Video: articulated robotics_ Crafting your dockerfile
-# - https://docs.docker.com/reference/dockerfile/
-# - https://docs.docker.com/engine/containers/run/
-# - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile
-
 # Basis Image für ros2 $ROS_DISTRO mit Desktop Anwendungen (RViz2, Gazebo ,rqt)
 ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop

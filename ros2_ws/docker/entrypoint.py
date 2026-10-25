@@ -160,7 +160,7 @@ async def async_main():
                     await asyncio.sleep(0.1)
 
         except Exception as e:
-            print(f"Verbindungsabbruch: {e}")
+            print(f"Verbindungsabbruch {ipaddress}: {e}")
             # Warte 5 Sekunden bevor erneutem Versuch!
             await asyncio.sleep(5)
 
