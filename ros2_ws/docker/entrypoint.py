@@ -33,7 +33,7 @@ def starte_RViz2_launch():
         return
 
     arbeitsverzeichnis = os.path.expanduser("~/ros2_ws")
-    bash_command = "source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch sim_arm_pkg mycobot_launch.py"
+    bash_command = "source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch sim_arm_pkg xarm6_launch.py"
     RViz2_process = subprocess.Popen(
         ["/bin/bash", "-c", bash_command],
         cwd=arbeitsverzeichnis,
