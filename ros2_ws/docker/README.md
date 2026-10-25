@@ -25,10 +25,11 @@ docker run -it \
 docker build -t xarm6_img --build-arg ROS_DISTRO=humble .
 ```
 
-## xArm6 Container
+## xArm6 Container  
+Wird ohne mount gestartet. Hier werden alle github bereits fest in das Image gecloned.
 ```
 docker run -it \
-  --name xarm6_e \
+  --name xarm6_container \
   --user ros \
   --hostname ros_container \
   --network=host \

@@ -41,7 +41,7 @@ class ROSNode(Node):
         goal_msg = MoveGroup.Goal()
 
         goal_msg.request.pipeline_id = 'ompl'
-        goal_msg.request.group_name = 'arm_group'
+        goal_msg.request.group_name = config['action_client']['group_name']
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
         goal_msg.request.max_velocity_scaling_factor = velocity_scaling
@@ -52,7 +52,7 @@ class ROSNode(Node):
         joint_constraints = []
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint2_to_joint1',
+            joint_name= config['joint_states']['axis_0'],
             position=axis_0,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -60,7 +60,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint3_to_joint2',
+            joint_name=config['joint_states']['axis_1'],
             position=axis_1,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -68,7 +68,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint4_to_joint3',
+            joint_name= config['joint_states']['axis_2'],
             position=axis_2,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -76,7 +76,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint5_to_joint4',
+            joint_name= config['joint_states']['axis_3'],
             position=axis_3,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -84,7 +84,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint6_to_joint5',
+            joint_name=config['joint_states']['axis_4'] ,
             position=axis_4,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -92,7 +92,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint6output_to_joint6',
+            joint_name=config['joint_states']['axis_5'],
             position=axis_5,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -108,7 +108,7 @@ class ROSNode(Node):
     def create_ompl_tcp_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, trans_x, trans_y, trans_z, rot_x, rot_y, rot_z, rot_w, position_tolerance, orientation_tolerance):
         goal_msg = MoveGroup.Goal()
         goal_msg.request.pipeline_id = 'ompl'   
-        goal_msg.request.group_name = 'arm_group'
+        goal_msg.request.group_name = config['action_client']['group_name']
 
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
@@ -130,8 +130,8 @@ class ROSNode(Node):
         target_pose.orientation.w = rot_w
 
         position_constraint = PositionConstraint()
-        position_constraint.header.frame_id = "g_base"
-        position_constraint.link_name = "joint6_flange"
+        position_constraint.header.frame_id = config['action_client']['frame_id']
+        position_constraint.link_name = config['action_client']['link_name']
         position_constraint.weight = 1.0
         box = SolidPrimitive()
         box.type = SolidPrimitive.BOX
@@ -146,8 +146,8 @@ class ROSNode(Node):
         )
 
         orientation_constraint = OrientationConstraint()
-        orientation_constraint.header.frame_id = "g_base"       #relativ zu g_base
-        orientation_constraint.link_name = "joint6_flange"      # tcp ist joint6_flange
+        orientation_constraint.header.frame_id = config['action_client']['frame_id']
+        orientation_constraint.link_name = config['action_client']['link_name']
         orientation_constraint.orientation.x = rot_x
         orientation_constraint.orientation.y = rot_y
         orientation_constraint.orientation.z = rot_z
@@ -175,7 +175,7 @@ class ROSNode(Node):
 
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
         goal_msg.request.planner_id = 'PTP'
-        goal_msg.request.group_name = 'arm_group'   # name of the planning group
+        goal_msg.request.group_name = config['action_client']['group_name']
 
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
@@ -188,7 +188,7 @@ class ROSNode(Node):
         joint_constraints = []
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint2_to_joint1',
+            joint_name=['joint_states']['axis_0'],
             position=axis_0,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -196,7 +196,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint3_to_joint2',
+            joint_name=['joint_states']['axis_1'],
             position=axis_1,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -204,7 +204,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint4_to_joint3',
+            joint_name=['joint_states']['axis_2'],
             position=axis_2,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -212,7 +212,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint5_to_joint4',
+            joint_name=['joint_states']['axis_3'],
             position=axis_3,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -220,7 +220,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint6_to_joint5',
+            joint_name=['joint_states']['axis_4'],
             position=axis_4,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -228,7 +228,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name='joint6output_to_joint6',
+            joint_name=['joint_states']['axis_5'],
             position=axis_5,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -246,7 +246,7 @@ class ROSNode(Node):
 
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
         goal_msg.request.planner_id = 'PTP'
-        goal_msg.request.group_name = 'arm_group'
+        goal_msg.request.group_name = config['action_client']['group_name']
 
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = float(planning_time)
@@ -267,8 +267,8 @@ class ROSNode(Node):
         target_pose.orientation.w = rot_w
 
         position_constraint = PositionConstraint()
-        position_constraint.header.frame_id = "g_base"
-        position_constraint.link_name = "joint6_flange"
+        position_constraint.header.frame_id = config['action_client']['frame_id']
+        position_constraint.link_name = config['action_client']['link_name']
         position_constraint.weight = 1.0
 
         box = SolidPrimitive()
@@ -283,8 +283,8 @@ class ROSNode(Node):
         position_constraint.constraint_region.primitive_poses.append(target_pose)
 
         orientation_constraint = OrientationConstraint()
-        orientation_constraint.header.frame_id = "g_base"
-        orientation_constraint.link_name = "joint6_flange"
+        orientation_constraint.header.frame_id = config['action_client']['frame_id']
+        orientation_constraint.link_name = config['action_client']['link_name']
         orientation_constraint.orientation.x = rot_x
         orientation_constraint.orientation.y = rot_y
         orientation_constraint.orientation.z = rot_z
@@ -307,7 +307,7 @@ class ROSNode(Node):
 
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
         goal_msg.request.planner_id = 'LIN'
-        goal_msg.request.group_name = 'arm_group'
+        goal_msg.request.group_name = config['action_client']['group_name']
 
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
@@ -328,8 +328,8 @@ class ROSNode(Node):
         target_pose.orientation.w = rot_w
 
         position_constraint = PositionConstraint()
-        position_constraint.header.frame_id = "g_base"
-        position_constraint.link_name = "joint6_flange"
+        position_constraint.header.frame_id = config['action_client']['frame_id']
+        position_constraint.link_name = config['action_client']['link_name']
         position_constraint.weight = 1.0
 
         box = SolidPrimitive()
@@ -344,8 +344,8 @@ class ROSNode(Node):
         position_constraint.constraint_region.primitive_poses.append(target_pose)
 
         orientation_constraint = OrientationConstraint()
-        orientation_constraint.header.frame_id = "g_base"
-        orientation_constraint.link_name = "joint6_flange"
+        orientation_constraint.header.frame_id = config['action_client']['frame_id']
+        orientation_constraint.link_name = config['action_client']['link_name']
         orientation_constraint.orientation.x = rot_x
         orientation_constraint.orientation.y = rot_y
         orientation_constraint.orientation.z = rot_z

@@ -7,54 +7,66 @@ OPC_Client:
 ########## Joint State Names ########################
 
 # Joint State Names für myCobot (topic: /joint_states)
-joint_states:
-  axis_0: joint2_to_joint1            
-  axis_1: joint3_to_joint2
-  axis_2: joint4_to_joint3
-  axis_3: joint5_to_joint4
-  axis_4: joint6_to_joint5
-  axis_5: joint6output_to_joint6
+# joint_states:
+#   axis_0: joint2_to_joint1            
+#   axis_1: joint3_to_joint2
+#   axis_2: joint4_to_joint3
+#   axis_3: joint5_to_joint4
+#   axis_4: joint6_to_joint5
+#   axis_5: joint6output_to_joint6
 
 # Joint State Names für xarm6 (topic: /joint_states)
-# joint_states:
-#   axis_0: joint_1            
-#   axis_1: joint_2
-#   axis_2: joint_3
-#   axis_3: joint_4
-#   axis_4: joint_5
-#   axis_5: joint_6
+joint_states:
+  axis_0: joint1            
+  axis_1: joint2
+  axis_2: joint3
+  axis_3: joint4
+  axis_4: joint5
+  axis_5: joint6
 
 ############# Servo Node Config ###############################
 
 # Servo Node für myCobot
-servo_node:
-  start_servo_service: '/servo_node/start_servo'
-  stop_servo_service: '/servo_node/stop_servo'
-  delta_joint_cmd_topic: '/servo_node/delta_joint_cmds'
-  delta_tcp_cmd_topic: '/servo_node/delta_twist_cmds'
-  status_topic: '/servo_node/status'
-  servo_base: 'g_base'  
+# servo_node:
+#   start_servo_service: '/servo_node/start_servo'
+#   stop_servo_service: '/servo_node/stop_servo'
+#   delta_joint_cmd_topic: '/servo_node/delta_joint_cmds'
+#   delta_tcp_cmd_topic: '/servo_node/delta_twist_cmds'
+#   status_topic: '/servo_node/status'
+#   servo_base: 'g_base'  
 
 # Servo Node für xArm6
-# servo_node:
-#   start_servo_service: '/servo_server/start_servo'
-#   stop_servo_service: '/servo_server/stop_servo'
-#   delta_joint_cmd_topic: '/servo_server/delta_joint_cmds'
-#   delta_tcp_cmd_topic: '/servo_server/delta_twist_cmds'
-#   status_topic: '/servo_server/status'
-#   servo_base: 'link_base'
+servo_node:
+  start_servo_service: '/servo_server/start_servo'
+  stop_servo_service: '/servo_server/stop_servo'
+  delta_joint_cmd_topic: '/servo_server/delta_joint_cmds'
+  delta_tcp_cmd_topic: '/servo_server/delta_twist_cmds'
+  status_topic: '/servo_server/status'
+  servo_base: 'link_base'
 
 ############# TCP Pose Config ################################
 
 # TCP Pose für myCobot
-tcp_pose:
-  parent_frame: g_base
-  child_frame: joint6_flange
+# tcp_pose:
+#   parent_frame: g_base
+#   child_frame: joint6_flange
 
 # TCP Pose für xArm6
-# tcp_pose:
-#   parent_frame: link_base
-#   child_frame: link_eef
+tcp_pose:
+  parent_frame: link_base
+  child_frame: link6
 
+##### Action Client Config #####
+# Action Client für myCobot
+# action_client:
+#   group_name: 'arm_group'
+#   frame_id: 'g_base'
+#   link_name: 'joint6_flange'
+
+# Action Client für xArm6
+action_client:
+  group_name: 'xarm6'
+  frame_id: 'link_base'
+  link_name: 'link6'
 
 
