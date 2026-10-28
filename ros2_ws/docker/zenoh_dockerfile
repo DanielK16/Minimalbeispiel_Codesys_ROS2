@@ -1,0 +1,107 @@
+# Autor Daniel Körper
+# ROS2 Container für die Entwicklung mit Zenoh und Turtlebot4
+
+# Basis Image
+ARG ROS_DISTRO=humble
+FROM osrf/ros:${ROS_DISTRO}-desktop
+ARG ROS_DISTRO
+
+# Environment Variablen
+ENV PIP_BREAK_SYSTEM_PACKAGES=1         
+ENV DEBIAN_FRONTEND=noninteractive      
+ENV XDG_RUNTIME_DIR=/tmp/runtime-ros   
+
+# System Abhängigkeiten und Basic Tools
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    wget \
+    apt-utils \
+    curl \
+    build-essential \
+    python3-pip \
+    python3-colcon-common-extensions && \
+    rm -rf /var/lib/apt/lists/*
+
+# asyncua
+RUN apt-get update && \
+    pip3 install asyncua --ignore-installed cryptography
+
+# Packages for TB4 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Common TB4 Packages
+    ros-${ROS_DISTRO}-turtlebot4-description \
+    ros-${ROS_DISTRO}-turtlebot4-msgs \
+    ros-${ROS_DISTRO}-turtlebot4-navigation \
+    ros-${ROS_DISTRO}-turtlebot4-node \
+    # TB4 Simulation
+    ros-${ROS_DISTRO}-turtlebot4-simulator \
+    ros-${ROS_DISTRO}-irobot-create-nodes \
+    ros-dev-tools \
+    # For Visualizing and Interfacing with Turtlebot from a PC
+    ros-${ROS_DISTRO}-turtlebot4-desktop \
+    # teleop twist keyboard
+    ros-${ROS_DISTRO}-teleop-twist-keyboard -y \
+    # Lidar Drivers
+    ros-${ROS_DISTRO}-rplidar-ros \
+    # OAK D Camera Drivers
+    ros-${ROS_DISTRO}-depthai-ros && \
+    rm -rf /var/lib/apt/lists/*
+
+# Cyclone DDS
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp && \
+    rm -rf /var/lib/apt/lists/*
+
+# ROS2 Environment updaten
+RUN rosdep update && \
+    grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /root/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc && \
+    grep -F "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" /root/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /root/.bashrc
+
+# ROS User anlegen
+RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
+
+ARG USERNAME=ros
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && mkdir -p /home/$USERNAME/.config \
+    && chown -R $USER_UID:$USER_GID /home/$USERNAME/.config
+
+# sudo rechte erteilen
+RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && usermod -aG video,dialout $USERNAME
+
+# ROS 2 Umgebung automatisch laden
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc
+
+# Standard-User setzen 
+USER $USERNAME
+WORKDIR /home/$USERNAME
+
+# Zenoh Install
+WORKDIR ros2_ws/src/zenoh
+
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+    python3-pip \
+    unzip \
+    wget \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
+
+RUN sudo apt-get update && \
+    pip3 install eclipse-zenoh==1.9.0 pycdr2
+
+ENV ZENOH_VERSION=1.9.0
+RUN wget -O zenoh-plugin-ros2dds.zip https://github.com/eclipse-zenoh/zenoh-plugin-ros2dds/releases/download/$ZENOH_VERSION/zenoh-plugin-ros2dds-$ZENOH_VERSION-x86_64-unknown-linux-gnu-standalone.zip
+RUN unzip zenoh-plugin-ros2dds.zip && \
+    chmod +x zenoh-bridge-ros2dds
+
+# ROS2 Environment exportieren
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_DOMAIN_ID=0
+ENV ROS_LOCALHOST_ONLY=0
+
+CMD ["bash"]

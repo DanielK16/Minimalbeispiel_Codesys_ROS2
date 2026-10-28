@@ -22,7 +22,7 @@ docker run -it \
 # xArm6 
 ## xArm6 Image
 ```
-docker build -t xarm6_img --build-arg ROS_DISTRO=humble .
+docker build -t xarm6_img --build-arg ROS_DISTRO=humble -f xarm6_dockerfile .
 ```
 
 ## xArm6 Container
