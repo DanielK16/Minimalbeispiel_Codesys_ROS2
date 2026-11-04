@@ -23,6 +23,7 @@ logging.basicConfig(level=logging.WARNING)
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
+config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class ROSNode(Node):
     def __init__(self):
