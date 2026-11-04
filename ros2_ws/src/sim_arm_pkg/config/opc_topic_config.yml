@@ -1,7 +1,7 @@
 ########## OPC UA Config #############################
 
 OPC_Client:
-  ipaddress: "172.25.170.32"
+  ipaddress: "172.21.225.150"
   port: "4840"
 
 ########## Joint State Names ########################
