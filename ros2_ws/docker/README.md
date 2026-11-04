@@ -3,8 +3,8 @@ Für jeden Roboter gibt es ein eigenes Dockerfile. Der Quellcode wird beim Build
 
 | Roboter | Dockerfile | Image | Container | Branch |
 |---|---|---|---|---|
-| myCobot280 | `dockerfile_mycobot280` | `mycobot280` | `mycobot280` | `main` |
-| xArm6 | `dockerfile_xarm6` | `xarm6` | `xarm6` | `xArm6` |
+| myCobot280 | `mycobot_dockerfile` | `mycobot280` | `mycobot280` | `main` |
+| xArm6 | `xarm6_dockerfile` | `xarm6` | `xarm6` | `xArm6` |
 
 
 ## myCobot280 
