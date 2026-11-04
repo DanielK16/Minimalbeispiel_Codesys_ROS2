@@ -1,19 +1,8 @@
 # Autor Daniel Körper
 # Dockerfile für die Entwicklung mit dem xArm6 
-<<<<<<< HEAD
 
 # Image bauen:
 #   docker build -t xarm6 -f dockerfile_xarm6 .
-=======
-# Quellen:
-# - https://docs.docker.com/reference/dockerfile/
-# - https://docs.docker.com/engine/containers/run/
-# - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile
-# - YT Videoreihe zu Docker von Articulated Robotics
-
-# Image bauen:
-#   docker build -t xarm6 --no-cache -f xarm6_dockerfile .
->>>>>>> bd159ce (dockerfile)
 # Container starten und OPC Server IP übergeben:
 #   docker run -it --name xarm6 --network host -e OPC_IP=172.21.225.150 -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix xarm6
 
@@ -82,10 +71,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # sudo rechte erteilen
 RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
-<<<<<<< HEAD
     && usermod -aG video,dialout $USERNAME
-=======
->>>>>>> bd159ce (dockerfile)
 
 # Standard-User setzen
 USER $USERNAME
