@@ -1,28 +1,24 @@
-# Dockerfile für ROS2 Jazzy und OPC UA Connection Minimalbeispiel
-# Quellen:  YT Video: articulated robotics_ Crafting your dockerfile
+# Autor: Daniel Körper
+# Dockerfile für ROS2 Humble und OPC UA Connection für das Minimalbeispiel und den myCobot
+# Quellen:  
 # - https://docs.docker.com/reference/dockerfile/
 # - https://docs.docker.com/engine/containers/run/
 # - https://github.com/automaticaddison/mycobot_ros2/blob/lyrical/docker/Dockerfile
 
-########################################
-# Basis Image für ros2 jazzy mit desktop anwendungen (rviz2, gazebo ,rqt)
-########################################
+# Basis Image für ros2 Humble mit Desktop anwendungen (rviz2, gazebo ,rqt)
 ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop-full
 # muss nach FROM nochmals deklariert werden da sonst nicht gültig 
 ARG ROS_DISTRO
 
-########################################
 # Environment Variablen anlegen
-########################################
 # verhindert Fehlermeldungen bei pip installs
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 # verhindert abfragen beim image bau -> Standard Werte werden verwendet
 ENV DEBIAN_FRONTEND=noninteractive
 
-########################################
-# Anlegen eines non root users
-########################################
+##### Anlegen eines non root users #####
+
 #  Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
 RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
 
@@ -47,14 +43,12 @@ USER ros
 # deswegen --user ros bei docker run
 USER root
 
-########################################
-# Systeminstallation als root
-########################################
-
+###### Systeminstallation als root #####
 # System Abhängigkeiten Installieren 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     sudo \
     python3-pip \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Python Packages installieren
@@ -67,17 +61,13 @@ RUN apt-get update && apt-get upgrade -y && \
     ros-${ROS_DISTRO}-moveit-py \
     && rm -rf /var/lib/apt/lists/*
     
-########################################
-# USER ros Umgebung einrichten
-########################################
+##### Standardmäßiger Start des Containers ######
 USER ros
 
 # source ros2 direkt in .bashrc schreiben damit automatisch gesourced
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/${USERNAME}/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "source /home/${USERNAME}/ros2_ws/install/setup.bash" >> ~/.bashrc
 
-########################################
-# Standardmäßiger Start des Containers
-########################################
 # standardmäßig root als user
 # ros user wird über docker run engestellt mit --user ros
 USER root

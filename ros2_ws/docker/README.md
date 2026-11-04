@@ -1,88 +1,49 @@
-# Übersicht um Docker Container und Images zu bauen/starten
-## My Cobot 280 Simulation
-### myCobot Image
+# Übersicht: Docker-Images bauen und Container starten
+Für jeden Roboter gibt es ein eigenes Dockerfile. Der Quellcode wird beim Build aus GitHub geladen. Nach dem Bauen des Images muss nur noch der Container gestartet werden.
+
+| Roboter | Dockerfile | Image | Container | Branch |
+|---|---|---|---|---|
+| myCobot280 | `mycobot_dockerfile` | `mycobot280` | `mycobot280` | `main` |
+| xArm6 | `xarm6_dockerfile` | `xarm6` | `xarm6` | `xArm6` |
+
+
+## myCobot280 
+### Image bauen
 ```
-docker build -t mycobot_sim_img --build-arg ROS_DISTRO=humble .
+docker build -t mycobot280 -f mycobot_dockerfile .
 ```
 
-### myCobot Container
+### Container starten
 ```
 docker run -it \
-  --name mycobot_sim \
-  --user ros \
-  --hostname ros_container \
-  --network=host \
+  --name mycobot280 \
+  --network host \
+  -e OPC_IP=<IP der SPS> \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v ~/Minimalbeispiel_Codesys_ROS2/ros2_ws:/home/ros/ros2_ws \
-  -w /home/ros/ros2_ws \
-  my_cobot_sim_img:latest \
+  mycobot280
 ```
 
-# xArm6 
-## xArm6 Image
+## xArm6 
+### Image bauen
 ```
-docker build -t xarm6_img --build-arg ROS_DISTRO=humble .
+docker build -t xarm6 -f xarm6_dockerfile .
 ```
 
-## xArm6 Container  
-Wird ohne mount gestartet. Hier werden alle github bereits fest in das Image gecloned.
+### Container starten
 ```
 docker run -it \
-  --name xarm6_container \
-  --user ros \
-  --hostname ros_container \
-  --network=host \
+  --name xarm6 \
+  --network host \
+  -e OPC_IP=<IP der SPS> \
   -e DISPLAY=$DISPLAY \
-  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-  -w /home/ros/ros2_ws \
-  xarm6_img:latest
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  xarm6
 ```
 
-## TB4 Real
-### TB4 Real Image
-```
-docker build -t tb4_real_img --build-arg ROS_DISTRO=humble -f tb4_dockerfile_real .
-```
-### TB4 Real Container
-```
-docker run -it \
-    --name tb4_real \
-    --user ros \
-    --hostname ros_container \
-    --network=host \
-    --ipc=host \
-    -e DISPLAY=$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -w /home/ros/ros2_ws \
-    tb4_real_img:latest
-```
-
-### Zenoh Container
-```
-docker run -d \
-  --name zenoh_client \
-  --init \
-  --net host \
-  -e ROS_DISTRO=humble \
-  client -e tcp/192.168.2.198:7447
-```
-
-## TB4 Simulation
-### TB4 Simulation Image
-```
-docker build -t tb4_sim_img --build-arg ROS_DISTRO=jazzy -f tb4_dockerfile_sim .
-```
-### TB4 Simulation Container
-```
-docker run -it \
-    --name tb4_sim \
-    --user ros \
-    --hostname ros_container \
-    --network=host \
-    --ipc=host \
-    -e DISPLAY=$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -w /home/ros/ros2_ws \
-    tb4_sim_img:latest
-```
+## Hilfreiche Befehle für Docker
+| Aufgabe | Befehl |
+|---|---|
+| Zweites Terminal im laufenden Container | `docker exec -it <container> bash` |
+| Container löschen| `docker rm <container>` |
+| Image neu bauen und dabei den aktuellen GitHub-Stand holen | `docker build --no-cache -t <image> -f <dockerfile> .` |
