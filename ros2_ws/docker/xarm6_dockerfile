@@ -1,13 +1,13 @@
 # Autor Daniel Körper
-# Dockerfile für die Entwicklung mit dem xArm6 (Simulation, MoveIt Servo, OPC UA)
-#
+# Dockerfile für die Entwicklung mit dem xArm6 
+
 # Image bauen:
 #   docker build -t xarm6 -f dockerfile_xarm6 .
-# Container starten:
-#   docker run -it --rm --network host -e OPC_IP=<IP der SPS> -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix xarm6
+# Container starten und OPC Server IP übergeben:
+#   docker run -it --name xarm6 --network host -e OPC_IP=172.21.225.150 -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix xarm6
 
 
-###### Basis Image mit Humble als Standard #####
+###### Basis Image ROS2 mit Humble als Standard #####
 ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop
 # muss nach FROM nochmals deklariert werden, sonst nicht gültig
@@ -16,15 +16,14 @@ ARG ROS_DISTRO
 # Shell auf bash umstellen 
 SHELL ["/bin/bash", "-c"]
 
-# Verhindert Rückfragen während der Installation (gilt nur beim Build)
+# Verhindert Rückfragen während der Installation 
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Environment Variablen
 # Erlaubt Pip Installationen
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
-# Laufzeitverzeichnis für GUI-Programme (RViz2), wird weiter unten angelegt
+# Laufzeitverzeichnis für GUI-Programme
 ENV XDG_RUNTIME_DIR=/tmp/runtime-ros
-# ROS Distribution auch zur Laufzeit verfügbar machen (für CMD)
 ENV ROS_DISTRO=${ROS_DISTRO}
 
 
@@ -47,7 +46,7 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN pip3 install asyncua --ignore-installed cryptography
 
 
-###### Roboterspezifische ROS 2 Pakete (xArm6) #####
+###### Installation ROS 2 Pakete #####
 RUN apt-get update && apt-get install -y --no-install-recommends \
         # MoveIt Inverse-Kinematik-Solver
         ros-${ROS_DISTRO}-pick-ik \
@@ -74,11 +73,6 @@ RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && usermod -aG video,dialout $USERNAME
 
-# Laufzeitverzeichnis für RViz2 anlegen 
-RUN mkdir -p /tmp/runtime-$USERNAME \
-    && chown $USER_UID:$USER_GID /tmp/runtime-$USERNAME \
-    && chmod 700 /tmp/runtime-$USERNAME
-
 # Standard-User setzen
 USER $USERNAME
 WORKDIR /home/$USERNAME
@@ -90,17 +84,18 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc &
 
 ###### Projekt aus GitHub installieren #####
 ARG REPO_URL=https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
+ARG REPO_BRANCH=xArm6
 
-# xArm6 (Treiber, Beschreibung, MoveIt-Konfiguration) in den Workspace klonen
+# xArm6 Github
 RUN mkdir -p /home/$USERNAME/ros2_ws/src && \
     git clone https://github.com/xArm-Developer/xarm_ros2.git --recursive -b ${ROS_DISTRO} /home/$USERNAME/ros2_ws/src/xarm_ros2
 
-RUN git clone --depth 1 ${REPO_URL} /home/$USERNAME/tmp_git
+# Quellcode für sim_arn_pkg
+RUN git clone --depth 1 -b ${REPO_BRANCH} ${REPO_URL} /home/$USERNAME/tmp_git
 
-# Benötigte Pakete in den Workspace verschieben: Simulation, Minimalbeispiel, myCobot und docker
+# Pakete in den Workspace verschieben
 RUN cp -r /home/$USERNAME/tmp_git/ros2_ws/src/sim_arm_pkg /home/$USERNAME/ros2_ws/src && \
     cp -r /home/$USERNAME/tmp_git/ros2_ws/src/minimalbeispiel_pkg /home/$USERNAME/ros2_ws/src && \
-    cp -r /home/$USERNAME/tmp_git/ros2_ws/src/mycobot_ros2 /home/$USERNAME/ros2_ws/src && \
     cp -r /home/$USERNAME/tmp_git/ros2_ws/docker /home/$USERNAME/ros2_ws && \
     rm -rf /home/$USERNAME/tmp_git
 
@@ -113,15 +108,14 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     rosdep install --from-paths src --ignore-src -r -y --rosdistro ${ROS_DISTRO} && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# Bauen des Workspaces
+# Bauen des ROS2 Workspaces
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-# Workspace Auto-Sourcing zur .bashrc hinzufügen
+# Workspace automatisch durch ~/.bashrc sourcen
 RUN echo "source /home/$USERNAME/ros2_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
 
-
 ###### Start des Containers #####
-# Automatischer Start der entrypoint.py (OPC UA Client für SoftKeys aus Codesys)
+# Automatischer Start der entrypoint.py 
 WORKDIR /home/$USERNAME/ros2_ws
 CMD ["/bin/bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/ros/ros2_ws/install/setup.bash && python3 -u /home/ros/ros2_ws/docker/entrypoint.py"]
