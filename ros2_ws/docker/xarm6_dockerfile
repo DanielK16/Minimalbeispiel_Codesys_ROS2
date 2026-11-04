@@ -2,89 +2,103 @@
 # Vereinfacht Test und Installation
 
 ##### Basis Image #####
-# Basis Image für ros2 $ROS_DISTRO mit Desktop Anwendungen (RViz2, Gazebo ,rqt)
+# Basis Image für ROS 2 ${ROS_DISTRO} mit Desktop Anwendungen (RViz2, Gazebo, rqt)
 ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop
 ARG ROS_DISTRO
 
-##### Environment Variablen #####
-# verhindert Fehlermeldungen bei pip installs
+##### Build-Argumente und Environment Variablen #####
+ARG DEBIAN_FRONTEND=noninteractive
+# verhindert Fehlermeldungen bei pip installs (PEP 668)
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
-# verhindert abfragen beim image bau -> Standard Werte werden verwendet
-ENV DEBIAN_FRONTEND=noninteractive
 
-# Anlegen eines non root users
-#  Alten ubuntu-User (UID 1000) entfernen, falls vorhanden
-RUN id -u 1000 &>/dev/null && userdel -r $(getent passwd 1000 | cut -d: -f1) || true
-
-# ARG ohne Leerzeichen ausführen
-ARG USERNAME=ros  
+# Benutzer: ARG-Werte ohne Leerzeichen am Zeilenende angeben
+ARG USERNAME=ros
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME\
-    && mkdir /home/$USERNAME/.config && chown $USER_UID:$USER_GID /home/$USERNAME/.config
+# Laufzeitverzeichnis für GUI-Programme (RViz2, Gazebo), wird weiter unten angelegt
+ENV XDG_RUNTIME_DIR=/tmp/runtime-ros
 
-# sudo rechte erteilen
+##### Systeminstallation als root #####
+USER root
+
+# System Abhängigkeiten installieren
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+        git \
+        nano \
+        python3-colcon-common-extensions \
+        python3-pip \
+        sudo && \
+    rm -rf /var/lib/apt/lists/*
+
+# Python Packages installieren (OPC-UA-Client für entrypoint.py)
+# --ignore-installed cryptography vermeidet Versionskonflikte mit dem System-Paket
+RUN pip3 install asyncua --ignore-installed cryptography
+
+# ROS 2 Packages installieren (MoveIt und Inverse-Kinematik-Solver)
+RUN apt-get update && \
+    apt-get install -y \
+        ros-${ROS_DISTRO}-pick-ik \
+        ros-${ROS_DISTRO}-moveit-py && \
+    rm -rf /var/lib/apt/lists/*
+
+##### Non-root-Benutzer anlegen #####
+# Alten Benutzer mit dieser UID entfernen, falls vorhanden.
+# Hinweis: "> /dev/null 2>&1" statt "&>", da RUN hier noch die Shell "sh" (dash) verwendet.
+RUN id -u $USER_UID > /dev/null 2>&1 && userdel -r $(getent passwd $USER_UID | cut -d: -f1) || true
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && mkdir -p /home/$USERNAME/.config \
+    && chown -R $USER_UID:$USER_GID /home/$USERNAME/.config
+
+# sudo Rechte erteilen
 RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-##### Systeminstallation als root ######
-USER root
+# Laufzeitverzeichnis für GUI-Programme anlegen (Rechte 700, sonst Qt-Warnung)
+RUN mkdir -p /tmp/runtime-$USERNAME \
+    && chown $USER_UID:$USER_GID /tmp/runtime-$USERNAME \
+    && chmod 700 /tmp/runtime-$USERNAME
 
-# System Abhängigkeiten Installieren 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    sudo \
-    python3-pip \
-    git \
-    nano \
-    && rm -rf /var/lib/apt/lists/*
+##### Installationen als Benutzer ros #####
+# Ab hier laufen alle Befehle und der Container selbst als Benutzer ros
+USER $USERNAME
 
-# Python Packages installieren
-# --break-system-pacakges erforderlich da sonst error
-RUN pip3 install asyncua --ignore-installed cryptography
-
-# ROS2 packages installieren
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y ros-${ROS_DISTRO}-pick-ik \
-    ros-${ROS_DISTRO}-moveit-py \
-    && rm -rf /var/lib/apt/lists/*
-
-###### Installationen als ros USER  ##### 
-
-# Standardmäßiger Start des Containers
-USER ros
-
-# Shell auf bash umstellen
+# Shell auf bash umstellen (wird für "source" benötigt)
 SHELL ["/bin/bash", "-c"]
 
-# Installation von xarm6 
-WORKDIR /home/${USERNAME}/ros2_ws/src
+# Workspace anlegen
+RUN mkdir -p /home/$USERNAME/ros2_ws/src
+WORKDIR /home/$USERNAME/ros2_ws/src
+
+# Installation des xArm6 (Treiber, Beschreibung, MoveIt-Konfiguration)
 RUN git clone https://github.com/xArm-Developer/xarm_ros2.git --recursive -b $ROS_DISTRO
 
-# sim arm pkg hinzufügen
-WORKDIR /home/${USERNAME}/temp_git
-RUN git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git && \
-cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/src/sim_arm_pkg  /home/${USERNAME}/ros2_ws/src && \
-cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/src/minimalbeispiel_pkg  /home/${USERNAME}/ros2_ws/src && \
-cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/src/mycobot_ros2  /home/${USERNAME}/ros2_ws/src && \
-cp -r Minimalbeispiel_Codesys_ROS2/ros2_ws/docker /home/${USERNAME}/ros2_ws && \
-rm -rf /home/ros/temp_git
+# Eigene Pakete aus GitHub hinzufügen: Simulation, Minimalbeispiel und mycobot
+RUN git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git /home/$USERNAME/temp_git && \
+    cp -r /home/$USERNAME/temp_git/ros2_ws/src/sim_arm_pkg /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/temp_git/ros2_ws/src/minimalbeispiel_pkg /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/temp_git/ros2_ws/src/mycobot_ros2 /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/temp_git/ros2_ws/docker /home/$USERNAME/ros2_ws && \
+    rm -rf /home/$USERNAME/temp_git
 
-# ROS2 Workspace bauen
-WORKDIR /home/${USERNAME}/ros2_ws 
-RUN source /opt/${USERNAME}/${ROS_DISTRO}/setup.bash && \
+# ROS 2 Abhängigkeiten installieren
+WORKDIR /home/$USERNAME/ros2_ws
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     sudo apt-get update && \
     rosdep update && \
-    rosdep install --from-paths src -y --ignore-src --rosdistro $ROS_DISTRO 
-RUN source /opt/${USERNAME}/humble/setup.bash &&\
-    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release 
+    rosdep install --from-paths src -y --ignore-src --rosdistro $ROS_DISTRO && \
+    sudo rm -rf /var/lib/apt/lists/*
 
-# ROS2 source direkt in .bashrc schreiben damit automatisch gesourced wenn neues Terminal geöffnet
-RUN echo "source /opt/${USERNAME}/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "source /home/${USERNAME}/ros2_ws/install/setup.bash" >> ~/.bashrc
+# ROS 2 Workspace bauen
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-# Standard-Befehl beim Start des Containers welches programm er öffnen soll!
-CMD ["python3", "-u", "/home/${USERNAME}/ros2_ws/docker/entrypoint.py"]
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc && \
+    echo "source /home/$USERNAME/ros2_ws/install/setup.bash" >> ~/.bashrc
 
+##### Start des Containers #####
+CMD ["/bin/bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/ros/ros2_ws/install/setup.bash && python3 -u /home/ros/ros2_ws/docker/entrypoint.py"]
