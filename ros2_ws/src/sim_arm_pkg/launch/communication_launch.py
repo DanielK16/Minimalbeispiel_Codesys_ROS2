@@ -15,13 +15,6 @@ def load_yaml(package_name, file_path):
 
 def generate_launch_description():
 
-    # moveit_config = MoveItConfigsBuilder(
-    #     robot_name="firefighter", 
-    #     package_name="mycobot_280arduino_moveit2"
-    # ).to_moveit_configs()
-
-    # moveit_py_config = load_yaml("mycobot_280arduino_moveit2", "config/moveit_py.yaml")
-
     return LaunchDescription([
 
         # Transformation von parent -> child
@@ -42,17 +35,6 @@ def generate_launch_description():
             executable = 'command_client',
             name = 'command_client_node'
         ),
-
-        # Node(
-        #     package = 'sim_arm_pkg',
-        #     executable = 'action_client_moveitpy',
-        #     name = 'action_client_node',
-        #     parameters=[
-        #         moveit_config.to_dict(),
-        #         moveit_py_config
-        #     ],
-        #     ros_arguments=['--log-level', 'moveit_ros:=warn', '--log-level', 'moveit_ros_planning:=warn', '--log-level', 'moveit:=warn'],
-        # ),
 
         Node(
             package = 'sim_arm_pkg',

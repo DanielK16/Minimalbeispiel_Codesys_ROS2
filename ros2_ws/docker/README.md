@@ -10,7 +10,7 @@ Für jeden Roboter gibt es ein eigenes Dockerfile. Der Quellcode wird beim Build
 ## myCobot280 
 ### Image bauen
 ```
-docker build -t mycobot280 -f mycobot_dockerfile .
+docker build -t mycobot280 --no-cache -f mycobot_dockerfile .
 ```
 
 ### Container starten
@@ -27,7 +27,7 @@ docker run -it \
 ## xArm6 
 ### Image bauen
 ```
-docker build -t xarm6 -f xarm6_dockerfile .
+docker build -t xarm6 --no-cache -f xarm6_dockerfile .
 ```
 
 ### Container starten
