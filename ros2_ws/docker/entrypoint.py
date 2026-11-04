@@ -34,7 +34,7 @@ def starte_RViz2_launch():
         return
 
     arbeitsverzeichnis = os.path.expanduser("~/ros2_ws")
-    bash_command = "source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch sim_arm_pkg mycobot_launch.py"
+    bash_command = "source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch sim_arm_pkg xarm6_launch.py"
     RViz2_process = subprocess.Popen(
         ["/bin/bash", "-c", bash_command],
         cwd=arbeitsverzeichnis,
@@ -160,7 +160,7 @@ async def async_main():
                     await asyncio.sleep(0.1)
 
         except Exception as e:
-            print(f"Verbindungsabbruch {ipaddress}: {e}")
+            print(f"Verbindungsabbruch: {e}")
             # Warte 5 Sekunden bevor erneutem Versuch!
             await asyncio.sleep(5)
 
