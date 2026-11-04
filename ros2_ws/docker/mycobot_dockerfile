@@ -1,0 +1,121 @@
+# Autor Daniel Körper
+# Dockerfile für die Entwicklung mit dem myCobot280
+
+# Image bauen:
+#   docker build -t mycobot280 -f dockerfile_mycobot280 .
+# Container starten und OPC Server IP übergeben:
+#   docker run -it --name mycobot280 --network host -e OPC_IP=172.25.170.32 -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix mycobot280
+
+
+###### Basis Image ROS2 mit Humble als Standard #####
+ARG ROS_DISTRO=humble
+FROM osrf/ros:${ROS_DISTRO}-desktop-full
+# muss nach FROM nochmals deklariert werden, sonst nicht gültig
+ARG ROS_DISTRO
+
+# Shell auf bash umstellen
+SHELL ["/bin/bash", "-c"]
+
+# Verhindert Rückfragen während der Installation
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Environment Variablen
+# Erlaubt Pip Installationen
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+# Laufzeitverzeichnis für GUI-Programme
+ENV XDG_RUNTIME_DIR=/tmp/runtime-ros
+ENV ROS_DISTRO=${ROS_DISTRO}
+
+
+###### System Abhängigkeiten und Basic Tools #####
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+        apt-utils \
+        build-essential \
+        curl \
+        git \
+        nano \
+        python3-pip \
+        python3-colcon-common-extensions \
+        sudo \
+        unzip \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+
+# Installation asyncua (OPC UA Client)
+RUN pip3 install asyncua --ignore-installed cryptography
+
+
+###### Installation ROS 2 Pakete #####
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        # MoveIt Inverse-Kinematik-Solver
+        ros-${ROS_DISTRO}-pick-ik \
+        # MoveIt Python Schnittstelle
+        ros-${ROS_DISTRO}-moveit-py && \
+    rm -rf /var/lib/apt/lists/*
+
+
+###### ROS Benutzer anlegen (ohne root) #####
+ARG USERNAME=ros
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# vorhandenen Benutzer mit dieser UID entfernen
+RUN id -u $USER_UID > /dev/null 2>&1 && userdel -r $(getent passwd $USER_UID | cut -d: -f1) || true
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && mkdir -p /home/$USERNAME/.config \
+    && chown -R $USER_UID:$USER_GID /home/$USERNAME/.config
+
+# sudo rechte erteilen
+RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && usermod -aG video,dialout $USERNAME
+
+# Standard-User setzen
+USER $USERNAME
+WORKDIR /home/$USERNAME
+
+# ROS2 Environment automatisch laden in Shell für den User
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc && \
+    echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/$USERNAME/.bashrc
+
+
+###### Projekt aus GitHub installieren #####
+ARG REPO_URL=https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
+ARG REPO_BRANCH=main
+
+# Quellcode für sim_arm_pkg, minimalbeispiel_pkg und mycobot_ros2
+RUN git clone --depth 1 ${REPO_URL} /home/$USERNAME/tmp_git
+
+# Pakete in den Workspace verschieben
+RUN mkdir -p /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/tmp_git/ros2_ws/src/sim_arm_pkg /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/tmp_git/ros2_ws/src/minimalbeispiel_pkg /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/tmp_git/ros2_ws/src/mycobot_ros2 /home/$USERNAME/ros2_ws/src && \
+    cp -r /home/$USERNAME/tmp_git/ros2_ws/docker /home/$USERNAME/ros2_ws && \
+    rm -rf /home/$USERNAME/tmp_git
+
+WORKDIR /home/$USERNAME/ros2_ws
+
+# ROS2 Abhängigkeiten installieren
+# warehouse_ros_mongo (MongoDB-Datenbank für MoveIt) ist nicht installierbar und wird nicht benötigt -> überspringen
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    sudo apt-get update && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y --rosdistro ${ROS_DISTRO} \
+        --skip-keys "warehouse_ros_mongo" && \
+    sudo rm -rf /var/lib/apt/lists/*
+
+# Bauen des ROS2 Workspaces
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+# Workspace automatisch durch ~/.bashrc sourcen
+RUN echo "source /home/$USERNAME/ros2_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
+
+###### Start des Containers #####
+# Automatischer Start der entrypoint.py
+WORKDIR /home/$USERNAME/ros2_ws
+CMD ["/bin/bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/ros/ros2_ws/install/setup.bash && python3 -u /home/ros/ros2_ws/docker/entrypoint.py"]
