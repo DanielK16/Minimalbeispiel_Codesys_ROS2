@@ -1,10 +1,10 @@
-########## OPC UA Config #############################
+##### OPC UA Config #####
 
 OPC_Client:
   ipaddress: "172.21.225.150"
   port: "4840"
 
-########## Joint State Names ########################
+##### Joint State Names #####
 
 # Joint State Names für myCobot (topic: /joint_states)
 # joint_states:
@@ -24,7 +24,7 @@ joint_states:
   axis_4: joint5
   axis_5: joint6
 
-############# Servo Node Config ###############################
+##### Servo Node Config #####
 
 # Servo Node für myCobot
 # servo_node:
@@ -44,7 +44,7 @@ servo_node:
   status_topic: '/servo_server/status'
   servo_base: 'link_base'
 
-############# TCP Pose Config ################################
+##### TCP Pose Config ######
 
 # TCP Pose für myCobot
 # tcp_pose:

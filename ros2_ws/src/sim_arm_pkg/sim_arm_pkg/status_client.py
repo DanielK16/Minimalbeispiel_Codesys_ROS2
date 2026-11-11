@@ -35,18 +35,10 @@ class OPC_UA_Client_Node(Node):
         self.current_tcp_pose = None
 
         # Subscriber für /joint_states
-        self.joint_states_sub = self.create_subscription(
-            JointState,
-            '/joint_states',
-            self.joint_states_callback,
-            1)
+        self.joint_states_sub = self.create_subscription(JointState,'/joint_states',self.joint_states_callback,1)
 
         # Subscriber für /tcp_pose
-        self.tcp_pose_sub = self.create_subscription(
-            Pose,
-            '/tcp_pose',
-            self.tcp_pose_callback,
-            1)
+        self.tcp_pose_sub = self.create_subscription(Pose,'/tcp_pose',self.tcp_pose_callback,1)
 
     # Verarbeiten von Subscriber erhaltene Daten    
     def joint_states_callback(self, msg):
