@@ -1,4 +1,4 @@
-# Diese file wurde mit Künstlicher Intelligenz (Gemini) erstellt aufgrund von Zeitgründen
+# Diese file wurde mit Künstlicher Intelligenz (Gemini) 
 # Kombinierter Launch für xArm6: MoveIt 2 Bahnplanung & MoveIt Servo (Fake Hardware)
 
 import os
