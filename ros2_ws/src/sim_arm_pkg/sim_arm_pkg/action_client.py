@@ -190,7 +190,7 @@ class ROSNode(Node):
         joint_constraints = []
 
         joint_constraints.append(JointConstraint(
-            joint_name=['joint_states']['axis_0'],
+            joint_name=config['joint_states']['axis_0'],
             position=axis_0,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -198,7 +198,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name=['joint_states']['axis_1'],
+            joint_name=config['joint_states']['axis_1'],
             position=axis_1,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -206,7 +206,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name=['joint_states']['axis_2'],
+            joint_name=config['joint_states']['axis_2'],
             position=axis_2,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -214,7 +214,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name=['joint_states']['axis_3'],
+            joint_name=config['joint_states']['axis_3'],
             position=axis_3,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -222,7 +222,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name=['joint_states']['axis_4'],
+            joint_name=config['joint_states']['axis_4'],
             position=axis_4,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
@@ -230,7 +230,7 @@ class ROSNode(Node):
         ))
 
         joint_constraints.append(JointConstraint(
-            joint_name=['joint_states']['axis_5'],
+            joint_name=config['joint_states']['axis_5'],
             position=axis_5,
             tolerance_above=joint_tolerance,
             tolerance_below=joint_tolerance,
