@@ -24,7 +24,8 @@ logging.basicConfig(level=logging.WARNING) # reduziert Fehlermeldungen von async
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
-    # Environment Variable von docker run übergebn
+# Umgebungsvariable OPC_IP überschreibt IP aus YAML Datei 
+# kann beim erstellen des Containers mit übergeben werden: docker run ... -e OPC_IP=172.25.170.32
 config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class OPC_UA_Client_Node(Node):
@@ -36,18 +37,11 @@ class OPC_UA_Client_Node(Node):
         self.current_tcp_pose = None
 
         # Subscriber für /joint_states
-        self.joint_states_sub = self.create_subscription(
-            JointState,
-            '/joint_states',
-            self.joint_states_callback,
-            1)
+        # QoS Depth = 1: es wird nur der aktuellste Wert gespeichert, ältere werden verworfen
+        self.joint_states_sub = self.create_subscription(JointState,'/joint_states',self.joint_states_callback,1)  
 
         # Subscriber für /tcp_pose
-        self.tcp_pose_sub = self.create_subscription(
-            Pose,
-            '/tcp_pose',
-            self.tcp_pose_callback,
-            1)
+        self.tcp_pose_sub = self.create_subscription(Pose,'/tcp_pose',self.tcp_pose_callback,1)
 
     # Verarbeiten von Subscriber erhaltene Daten    
     def joint_states_callback(self, msg):
@@ -74,7 +68,7 @@ async def async_main(args=None):
                       reconnect_request_timeout = 5.0, ) as client:
         ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
-        # Verbindung zu Knoten im OPC-UA Server herstellen
+        # Referenz zu Knoten im OPC-UA Server (Adressraum) herstellen
         # Position der Achsen 
         axis_nodes = {
             "axis_0": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotStatus.Ist_Pos_Axis.axis_0"),
@@ -114,17 +108,16 @@ async def async_main(args=None):
                 except Exception as e:
                     ros_node.get_logger().warn(f" Watchdog konnte nicht gesendet werden: {e}")
 
-                # aktuelle Joint States via OPC UA schreiben
+                # aktuelle Joint States (in rad) via OPC UA schreiben
                 if ros_node.current_joint_states is not None:
                     joint_state_msg = ros_node.current_joint_states
                     ros_node.current_joint_states = None  
                     
-                    # joint states werden im topic durcheinander gepublished, deswegen namenzuordnung!
+                    # Joint States werden im Topic durcheinander gepublished, deswegen Namenzuordnung!
                     try:
                         tasks = []  
                         for i, joint_name in enumerate(joint_state_msg.name):
                             pos_val = joint_state_msg.position[i]
-                            
                             if joint_name == config['joint_states']['axis_0']:
                                 tasks.append(axis_nodes["axis_0"].set_value(pos_val, ua.VariantType.Double))
                             elif joint_name == config['joint_states']['axis_1']:
@@ -137,9 +130,8 @@ async def async_main(args=None):
                                 tasks.append(axis_nodes["axis_4"].set_value(pos_val, ua.VariantType.Double))
                             elif joint_name == config['joint_states']['axis_5']:
                                 tasks.append(axis_nodes["axis_5"].set_value(pos_val, ua.VariantType.Double))
-                        
                         if tasks:
-                            # führt alle Schreibbefehle für die Achsen parallel gleichzeitig 
+                            # führt alle Schreibbefehle für die Achsen gleichzeitig aus 
                             await asyncio.gather(*tasks)
                     except Exception as e:
                         ros_node.get_logger().warn(f" Fehler beim Schreiben von /joint_states: {e}")
