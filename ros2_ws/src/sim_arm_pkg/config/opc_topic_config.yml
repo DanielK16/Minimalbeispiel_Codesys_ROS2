@@ -44,7 +44,7 @@ servo_node:
 #   status_topic: '/servo_server/status'
 #   servo_base: 'link_base'
 
-############# TCP Pose Config ################################
+############# TCP Pose Config (tcp_pose.py) ################################
 
 # TCP Pose für myCobot
 tcp_pose:

@@ -1,10 +1,12 @@
 # Autor: Daniel Körper
 # Code basiert auf Beispiel von:
 # https://docs.ros.org/en/humble/Tutorials/Intermediate/Tf2/Writing-A-Tf2-Listener-Py.html
+# Bestimmung der Endeffektorposition relativ zum MCS
 
+# ROS2 Imports
 import rclpy
 from rclpy.node import Node
-
+# ROS2 Interfaces
 from geometry_msgs.msg import Pose
 
 from tf2_ros.buffer import Buffer
@@ -26,26 +28,19 @@ class ROS_Node(Node):
         # Buffer erhält tf2 Transformation und buffert diese
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer,self)
-
         # Publisher für /tcp_pose
-        self.tcp_publisher = self.create_publisher(
-            Pose,
-            '/tcp_pose',
-            10
-        )
-
+        self.tcp_publisher = self.create_publisher(Pose,'/tcp_pose',10)
         # alle 0.5 sekunden veröffentlichen
         self.tf_timer = self.create_timer(0.5, self.tf_tcp_timer)
 
     def tf_tcp_timer(self):
-
         # transformation "nachschauen"
         try: 
             t = self.tf_buffer.lookup_transform(
                 self.parent_frame,  # g_base
                 self.child_frame,   # joint6_flange
-                rclpy.time.Time()   #um aktuellsten Transform zu bekommen
-                )
+                rclpy.time.Time())   #um aktuellsten Transform zu bekommen
+                
         except TransformException as ex:
             self.get_logger().info(f"Could not transform {self.child_frame} to {self.parent_frame}: {ex}")
             return
@@ -59,9 +54,7 @@ class ROS_Node(Node):
         msg.orientation.y = t.transform.rotation.y
         msg.orientation.z = t.transform.rotation.z
         msg.orientation.w = t.transform.rotation.w
-
         self.tcp_publisher.publish(msg)
-
 
 def main(args=None):
     rclpy.init(args=args)

@@ -19,14 +19,14 @@ import asyncio
 from asyncua import Client, ua
 import logging
 import os
-
 logging.basicConfig(level=logging.WARNING)
 
 # Laden der Konfigurationsdatei
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
-# Environment Variable von docker run übernehmen
+# Umgebungsvariable OPC_IP überschreibt IP aus YAML Datei 
+# kann beim erstellen des Containers mit übergeben werden: docker run ... -e OPC_IP=172.25.170.32
 config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class OPC_UA_Client_Node(Node):
@@ -55,6 +55,7 @@ class OPC_UA_Client_Node(Node):
         # Subscriber für Status der Servo Node
         self.status_subscriber = self.create_subscription(Int8, config['servo_node']['status_topic'], self.status_callback, 1)
 
+        # Variableninitialisierung
         # Status der Servo Node
         self.servo_status = None
         self.last_sent_status = None
@@ -117,8 +118,8 @@ class OPC_UA_Client_Node(Node):
         msg = JointJog()
         msg.header.frame_id = config['servo_node']['servo_base']
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.joint_names = [self.joint_names_list[0]]
-        msg.velocities = [0.0]
+        msg.joint_names = list(self.joint_names_list)
+        msg.velocities = [0.0] * len(self.joint_names_list)
         self.delta_axis_publisher.publish(msg)
 
     def servo_control(self):
@@ -141,10 +142,11 @@ class OPC_UA_Client_Node(Node):
             self.delta_tcp_publisher.publish(msg)
 
         # Achs Modus
+        # erwartet-1, 0 oder +1 je Gelenk
         elif self.mode_axis:
             directions = [self.axis_0, self.axis_1, self.axis_2, self.axis_3, self.axis_4, self.axis_5]
-            active_joints = []
-            active_velocities = []
+            active_joints = []      # Gelenknamen
+            active_velocities = []  # Gelenkgeschwindigkeiten
             for i in range(6):
                 if directions[i] != 0.0:
                     active_joints.append(self.joint_names_list[i])
@@ -259,7 +261,7 @@ async def async_main(args=None):
                     ) as client:
             ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
-            # Verbindung zu den OPC-UA-Knoten herstellen
+            # Referenz zu den OPC-UA-Knoten herstellen
             mode_node = {
                 "enable": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.enable"),
                 "mode_tcp": client.get_node("ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.Mode_TCP"),
@@ -352,7 +354,6 @@ async def async_main(args=None):
             ros_node.get_logger().info("Sende Stopp-Signal an Roboter...")
             ros_node.stop_servo_control()
             ros_node.destroy_node()
-
 
 def main(args=None):
 

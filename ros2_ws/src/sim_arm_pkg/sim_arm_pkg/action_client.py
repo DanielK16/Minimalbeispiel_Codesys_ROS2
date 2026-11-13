@@ -3,16 +3,16 @@
 # -https://github.com/moveit/moveit_tutorials/blob/master/doc/pilz_industrial_motion_planner/pilz_industrial_motion_planner.rst#id3
 # https://deepwiki.com/moveit/moveit2
 # https://docs.ros.org/en/humble/Tutorials/Intermediate/Writing-an-Action-Server-Client/Py.html
-
+# Imports für ROS2
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
-
+# Interfaces importieren
 from moveit_msgs.action import MoveGroup
 from moveit_msgs.msg import Constraints, JointConstraint, PositionConstraint, OrientationConstraint
 from shape_msgs.msg import SolidPrimitive
 from geometry_msgs.msg import Pose
-
+# Imports für asyncua
 import os
 import asyncio
 from asyncua import Client, ua
@@ -23,6 +23,8 @@ logging.basicConfig(level=logging.WARNING)
 import yaml
 with open("/home/ros/ros2_ws/src/sim_arm_pkg/config/opc_topic_config.yml", "r") as f:
     config = yaml.safe_load(f)
+# Umgebungsvariable OPC_IP überschreibt IP aus YAML Datei 
+# kann beim erstellen des Containers mit übergeben werden: docker run ... -e OPC_IP=172.25.170.32    
 config['OPC_Client']['ipaddress'] = os.environ.get('OPC_IP', config['OPC_Client']['ipaddress'])
 
 class ROSNode(Node):
@@ -40,19 +42,18 @@ class ROSNode(Node):
         self.get_logger().info('Action Server gefunden')
 
     def create_ompl_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5, joint_tolerance = 0.01):
+        # OMPL Ziel in Gelenkwinkeln
         goal_msg = MoveGroup.Goal()
-
         goal_msg.request.pipeline_id = 'ompl'
         goal_msg.request.group_name = config['action_client']['group_name']
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
         goal_msg.request.max_velocity_scaling_factor = velocity_scaling
         goal_msg.request.max_acceleration_scaling_factor = acceleration_scaling
-
         goal_msg.planning_options.plan_only = False
-
-        joint_constraints = []
-
+        
+        joint_constraints = []  # Sammeln der Randbedingungen in Liste
+        # Randbedingung für Gelenk 1
         joint_constraints.append(JointConstraint(
             joint_name= config['joint_states']['axis_0'],
             position=axis_0,
@@ -60,7 +61,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_1'],
             position=axis_1,
@@ -68,7 +68,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name= config['joint_states']['axis_2'],
             position=axis_2,
@@ -76,7 +75,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name= config['joint_states']['axis_3'],
             position=axis_3,
@@ -84,7 +82,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_4'] ,
             position=axis_4,
@@ -92,7 +89,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_5'],
             position=axis_5,
@@ -100,24 +96,20 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         goal_msg.request.goal_constraints = [
             Constraints(joint_constraints=joint_constraints)
         ]
-
         return goal_msg
 
     def create_ompl_tcp_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, trans_x, trans_y, trans_z, rot_x, rot_y, rot_z, rot_w, position_tolerance, orientation_tolerance):
+        # OMPL Ziel im kartesischen Raum
         goal_msg = MoveGroup.Goal()
         goal_msg.request.pipeline_id = 'ompl'   
         goal_msg.request.group_name = config['action_client']['group_name']
-
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
-
         goal_msg.request.max_velocity_scaling_factor = velocity_scaling
         goal_msg.request.max_acceleration_scaling_factor = acceleration_scaling
-        
         goal_msg.planning_options.plan_only = False
 
         # Zielposition des TCP
@@ -125,7 +117,6 @@ class ROSNode(Node):
         target_pose.position.x = trans_x
         target_pose.position.y = trans_y
         target_pose.position.z = trans_z
-
         target_pose.orientation.x = rot_x
         target_pose.orientation.y = rot_y
         target_pose.orientation.z = rot_z
@@ -136,16 +127,14 @@ class ROSNode(Node):
         position_constraint.link_name = config['action_client']['link_name']
         position_constraint.weight = 1.0
         box = SolidPrimitive()
-        box.type = SolidPrimitive.BOX
+        box.type = SolidPrimitive.BOX   
         box.dimensions = [
             position_tolerance * 2,  # X-Toleranz
             position_tolerance * 2,  # Y-Toleranz
             position_tolerance * 2   # Z-Toleranz
         ]
         position_constraint.constraint_region.primitives.append(box)
-        position_constraint.constraint_region.primitive_poses.append(
-            target_pose
-        )
+        position_constraint.constraint_region.primitive_poses.append(target_pose)
 
         orientation_constraint = OrientationConstraint()
         orientation_constraint.header.frame_id = config['action_client']['frame_id']
@@ -160,35 +149,25 @@ class ROSNode(Node):
         orientation_constraint.weight = 1.0
 
         constraints = Constraints()
-        constraints.position_constraints.append(
-            position_constraint
-        )
-        constraints.orientation_constraints.append(
-            orientation_constraint
-        )
-        goal_msg.request.goal_constraints = [
-            constraints
-        ]
+        constraints.position_constraints.append(position_constraint)
+        constraints.orientation_constraints.append(orientation_constraint)
+        goal_msg.request.goal_constraints = [constraints]
 
         return goal_msg
 
     def create_pilz_ptp_joint_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, axis_0, axis_1, axis_2, axis_3, axis_4, axis_5, joint_tolerance):
+        # Pilz PTP Ziel im Gelenkraum
         goal_msg = MoveGroup.Goal()
-
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
         goal_msg.request.planner_id = 'PTP'
         goal_msg.request.group_name = config['action_client']['group_name']
-
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
-
         goal_msg.request.max_velocity_scaling_factor = velocity_scaling     # scaling factor of maximal joint velocity
         goal_msg.request.max_acceleration_scaling_factor = acceleration_scaling #scaling factor of maximal joint aceleration
-
         goal_msg.planning_options.plan_only = False
 
         joint_constraints = []
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_0'],
             position=axis_0,
@@ -196,7 +175,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_1'],
             position=axis_1,
@@ -204,7 +182,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_2'],
             position=axis_2,
@@ -212,7 +189,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_3'],
             position=axis_3,
@@ -220,7 +196,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_4'],
             position=axis_4,
@@ -228,7 +203,6 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         joint_constraints.append(JointConstraint(
             joint_name=config['joint_states']['axis_5'],
             position=axis_5,
@@ -236,33 +210,26 @@ class ROSNode(Node):
             tolerance_below=joint_tolerance,
             weight=1.0
         ))
-
         goal_msg.request.goal_constraints = [
             Constraints(joint_constraints=joint_constraints)
         ]
-
         return goal_msg
 
     def create_pilz_ptp_tcp_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, trans_x, trans_y, trans_z, rot_x, rot_y, rot_z, rot_w, position_tolerance, orientation_tolerance):
         goal_msg = MoveGroup.Goal()
-
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
         goal_msg.request.planner_id = 'PTP'
         goal_msg.request.group_name = config['action_client']['group_name']
-
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = float(planning_time)
-
         goal_msg.request.max_velocity_scaling_factor = velocity_scaling
         goal_msg.request.max_acceleration_scaling_factor = acceleration_scaling
-
         goal_msg.planning_options.plan_only = False
 
         target_pose = Pose()
         target_pose.position.x = trans_x
         target_pose.position.y = trans_y
         target_pose.position.z = trans_z
-
         target_pose.orientation.x = rot_x
         target_pose.orientation.y = rot_y
         target_pose.orientation.z = rot_z
@@ -299,31 +266,25 @@ class ROSNode(Node):
         constraints = Constraints()
         constraints.position_constraints.append(position_constraint)
         constraints.orientation_constraints.append(orientation_constraint)
-
         goal_msg.request.goal_constraints = [constraints]
 
         return goal_msg
     
     def create_pilz_lin_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, trans_x, trans_y, trans_z, rot_x, rot_y, rot_z, rot_w, position_tolerance, orientation_tolerance):
         goal_msg = MoveGroup.Goal()
-
         goal_msg.request.pipeline_id = 'pilz_industrial_motion_planner'
         goal_msg.request.planner_id = 'LIN'
         goal_msg.request.group_name = config['action_client']['group_name']
-
         goal_msg.request.num_planning_attempts = planning_attempts
         goal_msg.request.allowed_planning_time = planning_time
-
         goal_msg.request.max_velocity_scaling_factor = velocity_scaling
         goal_msg.request.max_acceleration_scaling_factor = acceleration_scaling
-
         goal_msg.planning_options.plan_only = False
 
         target_pose = Pose()
         target_pose.position.x = trans_x
         target_pose.position.y = trans_y
         target_pose.position.z = trans_z
-
         target_pose.orientation.x = rot_x
         target_pose.orientation.y = rot_y
         target_pose.orientation.z = rot_z
@@ -341,7 +302,6 @@ class ROSNode(Node):
             position_tolerance * 2,
             position_tolerance * 2
         ]
-
         position_constraint.constraint_region.primitives.append(box)
         position_constraint.constraint_region.primitive_poses.append(target_pose)
 
@@ -360,15 +320,9 @@ class ROSNode(Node):
         constraints = Constraints()
         constraints.position_constraints.append(position_constraint)
         constraints.orientation_constraints.append(orientation_constraint)
-
         goal_msg.request.goal_constraints = [constraints]
 
         return goal_msg
-
-    def create_pilz_circ_goal(self, planning_attempts, planning_time, velocity_scaling, acceleration_scaling, trans_x, trans_y, trans_z, rot_x, rot_y, rot_z, rot_w, position_tolerance, orientation_tolerance):
-        # to do!
-        # center punkt definieren für
-        pass
 
     def create_goal(
         self,
@@ -410,9 +364,6 @@ class ROSNode(Node):
             elif planner_id == "LIN":
                 return self.create_pilz_lin_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
 
-            elif planner_id == "CIRC":
-                return self.create_pilz_circ_goal(planning_attempts,planning_time,velocity_scaling,acceleration_scaling,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,rot_w,position_tolerance,orientation_tolerance)
-
             else:
                 self.get_logger().error(f'Ungültige Planner ID: {planner_id}')
                 return None
@@ -436,18 +387,17 @@ class ROSNode(Node):
         if goal_msg is None:
             self.get_logger().error('Kein gültiges Goal vorhanden')
             return
-
         self.get_logger().info('Sende Ziel...')
+        # Goal wird asynchron gesendet,d.h. blockiert nicht!
         self.send_goal_future = self._action_client.send_goal_async(goal_msg)
         self.send_goal_future.add_done_callback(self.goal_response_callback)
 
     def goal_response_callback(self, future):
+        # Antwort des Servers auslesen
         goal_handle = future.result()
-
         if not goal_handle.accepted:
             self.get_logger().info('Goal rejected')
             return
-
         self.get_logger().info('Goal accepted')
         self._get_result_future = goal_handle.get_result_async()
         self._get_result_future.add_done_callback(self.get_result_callback)
@@ -464,25 +414,22 @@ class ROSNode(Node):
             self.get_logger().info(f'Fehlgeschlagen mit Fehlercode: {error_code}')
 
 async def async_main(args=None):
-
+    # ROS2 Node initialisieren
     ros_node = ROSNode()
-
     # OPC UA Verbindung
     ipaddress = config['OPC_Client']['ipaddress']
     port = config['OPC_Client']['port']
     opc_url = f"opc.tcp://{ipaddress}:{port}"
-
     try:
-
         # Verbindungsaufbau OPC UA
         ros_node.get_logger().info(f"Stelle Verbindung mit OPC Client her: {opc_url}")
         async with Client(
             url=opc_url,
-            timeout=2.0,                    # Each request sent to the server expects an answer within this time
-            watchdog_intervall=0.5,         # The time between checking if the server is still allive in seconds 
-            auto_reconnect=True,            # Reestablish Connection on loss
-            reconnect_max_delay=5.0,        # Exponential backoff cap for reconnect attempts (seconds)
-            reconnect_request_timeout=5.0   # how long requests block waiting for the connection to become ready while the supervisor is connecting
+            timeout=2.0,                   
+            watchdog_intervall=0.5,   
+            auto_reconnect=True,         
+            reconnect_max_delay=5.0,      
+            reconnect_request_timeout=5.0   
         ) as client:
             ros_node.get_logger().info(f"OPC Client verbunden: {opc_url}")
 
@@ -602,15 +549,12 @@ async def async_main(args=None):
                         orientation_tolerance=orientation_tolerance,
                         joint_tolerance = joint_tolerance
                     )
-
                     ros_node.send_goal(goal_msg)
-
 
                 await asyncio.sleep(0.01)
 
     except asyncio.TimeoutError:
         ros_node.get_logger().error(f"OPC UA Server nicht erreichbar: {opc_url}")
-
     except Exception as e:
         ros_node.get_logger().error(f"OPC UA Verbindungsfehler: {e}")
 
