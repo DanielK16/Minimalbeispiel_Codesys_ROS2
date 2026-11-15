@@ -28,7 +28,7 @@
 |Container Plattform|Docker Desktop 4.88.1|docker version|	
 |SPS Entwicklungsumgebung|Codesys Development V3.5 SP22 Patch 2|Codesys Installer |
 |SPS Runtime| CODESYS Virtual Runtime for Linux SL|Codesys Installer|
-|ROS Distribution	|ROS2 Jazzy| echo $ROS_DISTRO|
+|ROS Distribution	|ROS2 Humble| echo $ROS_DISTRO|
 |Versionsverwaltung|git 2.43.0| git --version|
 
 ![Entwicklungsumgebung Aufbau](/doc/img/Aufbau_Entwicklungsumgebung.png)
