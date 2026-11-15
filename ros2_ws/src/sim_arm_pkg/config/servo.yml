@@ -1,3 +1,4 @@
+# Autor: Daniel Körper
 # MoveIt Servo Konfiguration für myCobot 
 # übernommen von https://github.com/xArm-Developer/xarm_ros2/blob/humble/xarm_moveit_servo/config/xarm_moveit_servo_config.yaml und angepasst
 # offizielle Doku: https://github.com/moveit/moveit2/blob/main/moveit_ros/moveit_servo/config/servo_parameters.yaml
@@ -57,9 +58,9 @@ self_collision_proximity_threshold: 0.01 # Abstand in Metern, ab dem gewarnt wir
 scene_collision_proximity_threshold: 0.02
 
 # Singularitäten und Joint Limits
-lower_singularity_threshold: 1400.0               # Erst ab Konditionszahl 600 abbremsen
-hard_stop_singularity_threshold: 2900.0          # Not-Stopp erst bei extremen Singularitäten
-leaving_singularity_threshold_multiplier: 3.0    # Erleichtert das Herausfahren aus Singularitäten
+lower_singularity_threshold: 1400.0              # Abbremsen sobald Konditionszahl erreicht
+hard_stop_singularity_threshold: 2900.0          # Anhalten wenn Konditionszahl erreicht
+leaving_singularity_threshold_multiplier: 3.0    # Schneller aus Singularität herausfahren
 joint_limit_margin: 0.1 # [rad] Sicherheitsabstand zu den mechanischen Gelenk-Limits
 
 is_primary_planning_scene_monitor: true
