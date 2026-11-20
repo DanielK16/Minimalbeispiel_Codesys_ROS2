@@ -33,7 +33,8 @@
 
 ![Entwicklungsumgebung Aufbau](/doc/img/Aufbau_Entwicklungsumgebung.png)
 
-## b: Installation der Entwicklungsumgebung
+## b: Installation der Entwicklungsumgebung  
+Eine ausführliche Anleitung befindet sich im Bericht!
 0. WSL2 einrichten
 In Windows Power Shell:
 ```
