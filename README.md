@@ -37,7 +37,7 @@ Dieses Repository enthält eine Kommunikationsschnittstelle zwischen einer virtu
 ![Entwicklungsumgebung Aufbau](/doc/img/Aufbau_Entwicklungsumgebung.png)
 
 ## b: Installation der Entwicklungsumgebung  
-Eine ausführliche Anleitung befindet sich im Bericht!
+Eine ausführliche Anleitung befindet sich im Bericht!  
 0. WSL2 einrichten
 In Windows Power Shell als Administrator:
 ```
