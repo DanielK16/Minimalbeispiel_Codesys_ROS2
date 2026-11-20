@@ -1,3 +1,6 @@
+# Kommunikationsschnittstelle zwischen CODESYS und ROS 2 via OPC UA
+Dieses Repository enthält eine Kommunikationsschnittstelle zwischen einer virtuellen CODESYS-SPS (vSPS) und ROS 2 Humble auf Basis von OPC UA. Die Schnittstelle wird zunächst an einem Minimalbeispiel mit turtlesim erläutert und anschließend auf die in ROS 2 simulierten Roboterarme myCobot 280 und xArm6 übertragen. Die Roboter werden über eine CODESYS-Visualisierung manuell verfahren (MoveIt Servo) oder über Bahnplanungsaufträge an MoveIt 2 automatisch bewegt.
+
 # Inhaltsverzeichnis
 <details>
 <summary><b>Klicke hier, um das Inhaltsverzeichnis aufzuklappen</b></summary>
@@ -23,7 +26,7 @@
 ## a: Entwicklungsumgebung
 |Tool|Version|Befehl zum Prüfen|
 |---|---|---|
-|Host Betriebssystem|WIN11|winver|
+|Host Betriebssystem|WIN11 25H2|winver|
 |Subsystem|WSL2: Ubuntu-24.04 | wsl -l -v|	
 |Container Plattform|Docker Desktop 4.88.1|docker version|	
 |SPS Entwicklungsumgebung|Codesys Development V3.5 SP22 Patch 2|Codesys Installer |
@@ -36,23 +39,21 @@
 ## b: Installation der Entwicklungsumgebung  
 Eine ausführliche Anleitung befindet sich im Bericht!
 0. WSL2 einrichten
-In Windows Power Shell:
+In Windows Power Shell als Administrator:
 ```
 wsl --install -d Ubuntu-24.04
 ```
-Anschließend Benutzer und Passwort festlegen.  
-wsl kann gestartet werden mit: ``` wsl ```  
-Für OPC UA wird später SSH benötigt:
+Beim ersten Start werden Benutzername und Kennwort festgelegt. Die installierte Version wird geprüft mit wsl -l -v.  
+Der Netzwerkmodus ist standardmäßig auf NAT eingestellt, d.h. WSL und Windows haben unterschiedliche IP Adressen.
+0.1 Für OPC UA wird später SSH benötigt:
 ```
 sudo apt update && sudo apt install -y openssh-server
-service ssh start
+sudo systemctl enable ssh
+sudo systemctl status ssh
 ```
+1. Docker Desktop installieren
+Nach der Installation von Docker Desktop muss unter Settings → Resources → WSL Integration die Integration für Ubuntu 24.04 aktiviert werden.
 
-1. Github in WSL Workspace clonen
-In WSL:  
-```
-git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
-```
 2. Dockerfile -> Image
 Im Github liegt ein Dockerfile ab unter /Minimalbeispiel_Codesys_ROS2/ros2_ws/docker
 ```
