@@ -53,25 +53,20 @@ In WSL:
 git clone https://github.com/DanielK16/Minimalbeispiel_Codesys_ROS2.git
 ```
 2. Dockerfile -> Image
-Im Github liegt ein Dockerfile ab unter /Minimalbeispiel_Codesys_ROS2
-Passe `--build-arg` an, ob ROS 2 **Humble** oder **Jazzy** benötigt wird:
+Im Github liegt ein Dockerfile ab unter /Minimalbeispiel_Codesys_ROS2/ros2_ws/docker
 ```
-docker build -t <image_name> --build-arg ROS_DISTRO=humble .
+docker build -t <image_name> mycobot280 --no-cache -f mycobot_dockerfile .
 ```
 
 3. Image -> Container  
-eventuell -v (Volume) anpassen je nachdem wohin github gecloned wurde!    
-**auf Pfad achten -v!**  
+OPC IP anpassen!  
 ```
 docker run -it \
-  --name minimalbsp_ros2_codesys \
-  --user ros \
-  --hostname ros_container \
+  --name mycobot280 \
   --network=host \
   -e DISPLAY=$DISPLAY \
+  - OPC_IP=172.21.225.150
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v ~/Minimalbeispiel_Codesys_ROS2/ros2_ws:/home/ros/ros2_ws \
-  -w /home/ros/ros2_ws \
   <image_name> \
 ```
 4. Container starten mit:
@@ -83,16 +78,6 @@ docker exec -it <container_name> bash
 4. Codesys Projekt öffnen und mit Deploy Tool Container einrichten
 Die Einrichtung mit dem Deploy Tool ist weiter unten ausführlich erklärt
 
-5. ROS2 Projekt bauen
-```
-sudo apt update && sudo apt upgrade -y
-cd ~/ros2_ws
-rosdep init
-rosdep update
-rosdep install --from-paths src --ignore-src -r -y
-colcon build
-source install/setup.bash
-```
 </details>
 
 # 1. Minimalbeispiel für Datenaustausch zwischen ROS2 und Codesys via OPC UA
