@@ -109,10 +109,7 @@ Codesys -> ROS2: Steuerung der Schildkröte mit Tastern
 Dafür werden die Items in Variablenlsite beschrieben und bei Datenänderung dann von mit einer ros2 node gepublished.
 
 # 2. Setup für OPC UA Verbindung
-
-
 ## a: Setup für CODESYS Virtual Control for Linux SL
-
 ### 1. Deploy Tool installieren 
 Folgende Tools sind mit dem **Codesys Install Manager** zu installieren:
 * 'CODESYS Virtual Control for Linux SL'
@@ -142,7 +139,6 @@ Folgende Images sind zu installieren:
 
 ### 6. Verbindung Device herstellen
 ![Verbindung zum Device herstellen!](/doc/img/device_verbiindung_codesys.png)
-  
 
 # 3. Simulation MyCobot280
 
@@ -175,15 +171,6 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 |int32|DINT|
 |int16|INT|
 |string|STRING|
-
-## Launch der ros2 Dateien
-Zuerst in Codesys einloggen, dann ros2 launch!
-```
-cd ~/ros2_ws
-source install/setup.bash
- ros2 launch sim_arm_pkg mycobot_launch.py 
-ros2 launch sim_arm_pkg communication_launch.py 
-```
 
 # Beispielsvideo zur Steuerung der Visualisierung
 ## Manuelle Steuerung
