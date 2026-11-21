@@ -172,10 +172,6 @@ ist für den Datenaustauch ROS2<->Codesys verantwortlich. Steuert RVIZ über Mov
 |int16|INT|
 |string|STRING|
 
-# Beispielsvideo zur Steuerung der Visualisierung
-## Manuelle Steuerung
-![mycobot manuelle Steuerung](/doc/vid/mycobot_manuelle_steuerung.gif)
-
 ## Automatik Steuerung mit Bahnplanung durch MoveIt
 Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw. Konfigurationen für die Bahnplanung realisiert werden:
 
