@@ -1,28 +1,7 @@
 # Kommunikationsschnittstelle zwischen CODESYS und ROS 2 via OPC UA
 Dieses Repository enthält eine Kommunikationsschnittstelle zwischen einer virtuellen CODESYS-SPS (vSPS) und ROS 2 Humble auf Basis von OPC UA. Die Schnittstelle wird zunächst an einem Minimalbeispiel mit turtlesim erläutert und anschließend auf die in ROS 2 simulierten Roboterarme myCobot 280 und xArm6 übertragen. Die Roboter werden über eine CODESYS-Visualisierung manuell verfahren (MoveIt Servo) oder über Bahnplanungsaufträge an MoveIt 2 automatisch bewegt.
 
-# Inhaltsverzeichnis
-<details>
-<summary><b>Klicke hier, um das Inhaltsverzeichnis aufzuklappen</b></summary>
-
-* [0. Einrichtung der Entwicklungsumgebung](#0-einrichtung-der-entwicklungsumgebung)
-  * [a. Übersicht Entwicklungsumgebung](#a-übersicht-der-entwicklungsumgebung)
-  * [b. Installation der Entwicklungsumgebung](#b-installation-der-entwicklungsumgebung)
-* [1. Minimalbeispiel für Datenaustausch zwischen ROS 2 und CODESYS via OPC UA](#1-minimalbeispiel-für-datenaustausch-zwischen-ros-2-und-codesys-via-opc-ua)
-  * [a. Aufbau des OPC UA Adressraums](#a-aufbau-des-opc-ua-adressraums)
-  * [b. Datenaustausch ROS 2 und CODESYS](#b-datenaustausch-ros-2-und-codesys)
-  * [c. Start des Minimalbeispiels](#c-start-des-minimalbeispiels)
-  * [d. Übersicht des Minimalbeispiels](#d-übersicht-des-minimalbeispiels)
-* [2. Setup des OPC UA Servers](#2-setup-des-opc-ua-servers)
-  * [a. Setup für CODESYS Virtual Control for Linux SL](#a-setup-für-codesys-virtual-control-for-linux-sl)
-* [3. Simulation MyCobot 280](#3-simulation-mycobot-280)
-
-</details>
-
 # 0. Einrichtung der Entwicklungsumgebung:
-<details>
-<summary><b>Klicke hier, um Kapitel 0 aufzuklappen</b></summary>  
-
 ## a: Entwicklungsumgebung
 |Tool|Version|Befehl zum Prüfen|
 |---|---|---|
@@ -59,7 +38,6 @@ Im Github liegt ein Dockerfile ab unter /Minimalbeispiel_Codesys_ROS2/ros2_ws/do
 ```
 docker build -t <image_name> mycobot280 --no-cache -f mycobot_dockerfile .
 ```
-
 3. Image -> Container  
 OPC IP anpassen!  
 ```
@@ -80,11 +58,7 @@ docker exec -it <container_name> bash
 4. Codesys Projekt öffnen und mit Deploy Tool Container einrichten
 Die Einrichtung mit dem Deploy Tool ist weiter unten ausführlich erklärt
 
-</details>
-
 # 1. Minimalbeispiel für Datenaustausch zwischen ROS2 und Codesys via OPC UA
-<details>
-<summary><b>Klicke hier, um Kapitel 1 aufzuklappen</b></summary>  
 
 Das Ziel ist es mithilfe von **turlesim** den Datenaustausch zwischen ROS2 und Codesys darzustellen und zu erlernen wie OPC UA dafür eingebaut und genutzt werden kann.
 turtlesim ist ein Einsteigertool um ROS2 Konzepte zu erlernen.
@@ -134,11 +108,8 @@ Dabei wird zunächst auf das topic /tutle1_pose subscribed und dann die variable
 Codesys -> ROS2: Steuerung der Schildkröte mit Tastern
 Dafür werden die Items in Variablenlsite beschrieben und bei Datenänderung dann von mit einer ros2 node gepublished.
 
-</details>  
-
 # 2. Setup für OPC UA Verbindung
-<details>
-<summary><b>Klicke hier, um Kapitel 2 aufzuklappen</b></summary>  
+
 
 ## a: Setup für CODESYS Virtual Control for Linux SL
 
@@ -171,12 +142,9 @@ Folgende Images sind zu installieren:
 
 ### 6. Verbindung Device herstellen
 ![Verbindung zum Device herstellen!](/doc/img/device_verbiindung_codesys.png)
-
-</details>  
+  
 
 # 3. Simulation MyCobot280
-<details>
-<summary><b>Klicke hier, um Kapitel 3 aufzuklappen</b></summary>  
 
 ## a: Aufbau des transformations tree mycobot280
 Um den Aufbau des Transformationen Baums zu sehen kann man folgendes tool verwenden:
@@ -217,31 +185,7 @@ source install/setup.bash
 ros2 launch sim_arm_pkg communication_launch.py 
 ```
 
-## Aufbau des OPC UA Adressraums für mycobot Visualisierung  
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="/doc/img/uaE_Base.png" width="100%"><br>
-      <sub><b>Base</b></sub>
-    </td>
-    <td align="center">
-      <img src="/doc/img/uaE_Status.png" width="100%"><br>
-      <sub><b>Status</b></sub>
-    </td>
-    <td align="center">
-      <img src="/doc/img/uaE_Command.png" width="100%"><br>
-      <sub><b>Command</b></sub>
-    </td>
-    <td align="center">
-      <img src="/doc/img/uaE_Action.png" width="100%"><br>
-      <sub><b>Action</b></sub>
-    </td>
-  </tr>
-</table>  
-
 # Beispielsvideo zur Steuerung der Visualisierung
-![Visualisierung Codesys](/doc/img/Visualisierung_Codesys2.png)
 ## Manuelle Steuerung
 ![mycobot manuelle Steuerung](/doc/vid/mycobot_manuelle_steuerung.gif)
 
@@ -255,16 +199,14 @@ Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw.
 * **Pilz Industrial Motion Planner:**
   * Ermöglicht die Bahnplanung ebenfalls wahlweise im Gelenk- oder im kartesischen Raum.
   * Unterstützt die standardisierten PTP (*Point-to-Point*), LIN (*Linear*) und CIR (*Circular*).
-  * *Hinweis zum Implementierungsstatus:* PTP Bewegungen funktionieren oft fehlerfrei. LIN Bewegungen erfordern noch nicht zu komplett. CIRC muss noch implementiert werden
+  * *Hinweis zum Implementierungsstatus:* PTP Bewegungen funktionieren oft fehlerfrei.
   * LIN schlägt häufiger fehl da mit 6 achsen nicht jede position linear angefahren werden kann! Orientierung muss übereinstimmen!
   * Bei LIN Scaling auf ca. 0.005
-
-</details>  
 
 
 # 4. Adressraum OPC UA
 Es gibt zwei Möglichkeiten einen OPC Server zu erstellen mithilfe Codesys.  
-Ab Codesys V3.5 SP18 empfiehlt CODESYS die Verwendung des Konfigurationseditors IEC Symbolkonfiguration.
+Ab Codesys V3.5 SP18 empfiehlt CODESYS die Verwendung des Konfigurationseditors IEC Symbolkonfiguration.  
 ![Moeglichkeiten_OPCUA](/doc/img/Moeglichkeiten_OPCUA.png)
 * Möglichkeit 1: Verwendung Kommunikationsverwalter + Symbolgruppe:  
 Darstellung der NodeID nur in diesem Format möglich:
