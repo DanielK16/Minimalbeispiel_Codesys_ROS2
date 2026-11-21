@@ -263,15 +263,13 @@ Im Rahmen der aktuellen Projektumsetzung können vier verschiedene Ansätze bzw.
 
 
 # 4. Adressraum OPC UA
-https://www.youtube.com/watch?v=Ahd34XcDj9I&t=216s
 Es gibt zwei Möglichkeiten einen OPC Server zu erstellen mithilfe Codesys.  
 Ab Codesys V3.5 SP18 empfiehlt CODESYS die Verwendung des Konfigurationseditors IEC Symbolkonfiguration.
+
 * Möglichkeit 1: Verwendung Kommunikationsverwalter + Symbolgruppe:  
 Darstellung der NodeID nur in diesem Format möglich:
 **ns=5;s=AQAAAKbhKnGK9zM6uvotdobvJ2ac8zBx6Q==**
-![Symbolgruppe](/doc/img/Symbolgruppe.png)
-
 * Möglichkeit 2: Verwendung Symbolkonfiguration
 Darstellung der NodeID in folgendem gut lesbaren Format:
 **ns=4;s=|var|CODESYS Virtual Control for Linux SL.Application.GVL_OPCUA.RobotCommand.axis_servo.axis_0** 
-![Symbolkonfiguration](/doc/img/Symbolkonfiguration.png)
+
